@@ -24,6 +24,9 @@ namespace Runtime.Grid
             _map[location] = blockData;
         }
 
+        #region Saving and loading
+
+        
         public void Load(string mapName)
         {
             if (!PlayerPrefs.HasKey(mapName))
@@ -57,5 +60,7 @@ namespace Runtime.Grid
             PlayerPrefs.Save();
             Debug.LogWarning("Saved " + JsonConvert.SerializeObject(_map));
         }
+        
+        #endregion
     }
 }
