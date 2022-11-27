@@ -8,30 +8,16 @@ namespace Runtime.Grid
 {
     public class GridManager : SingletonMonoBehaviour<GridManager>
     {
-        private MapData _mapData;
+        private BaseBlock[] _blocks;
 
         private void Awake()
         {
-            _mapData = new MapData();
-            _mapData.Load(SceneManager.GetActiveScene().name);
+            _blocks = FindObjectsOfType<BaseBlock>();
         }
 
-        public bool TryMoveTo(Vector3Int myPos, Vector3Int targetPos)
+        public BaseBlock GetBlockAt(Vector3Int location)
         {
-            BaseBlock myBlock = GetBlockAt(myPos);
-            BaseBlock targetBlock = GetBlockAt(targetPos);
-
-            BlockData myBlockData = MapData.GetBlockDataAt(myPos);
-            BlockData targetBlockData = MapData.GetBlockDataAt(targetPos);
-            
-            return false;
+            return _blocks.FirstOrDefault(block => block.transform.position.ToVector3Int() == location);
         }
-
-        public BaseBlock GetBlockAt(Vector3Int vector3Int)
-        {
-            return FindObjectsOfType<BaseBlock>().FirstOrDefault(data => data.transform.position == vector3Int);
-        }
-
-        public MapData MapData => _mapData;
     }
 }

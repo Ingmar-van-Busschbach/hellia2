@@ -7,29 +7,31 @@ namespace Runtime.Blocks
 {
     public class MoveableBlock : BaseBlock
     {
-        public override bool CanMove(Vector3Int direction)
+        public override BlockType BlockType => BlockType.Moveable;
+        protected override bool CanMoveTo(Vector3Int newPosition)
         {
-            Vector3Int targetPos = transform.position.ToVector3Int() + direction;
-            BlockData targetBlockData = GridManager.Instance.MapData.GetBlockDataAt(targetPos);
-            
-            if (targetBlockData.type == BlockType.Empty)
-            {
-                return true;
-            }
+            Vector3Int myPos = transform.position.ToVector3Int();
+            Vector3Int direction =newPosition - myPos;
+        
+            BaseBlock blockAtLocation = GridManager.Instance.GetBlockAt(newPosition);
+            BaseBlock floorBlockAtLocation = GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down);
 
-            return false;
-        }
-
-        public override bool TryMove(Vector3Int direction)
-        {
-            if (!CanMove(direction)) return false;
-            transform.position += direction;
+            if (blockAtLocation != null) return false;
+            if (floorBlockAtLocation == null) return false;
             return true;
         }
 
-        public override bool CanBeOvertakenByType(BlockType type)
+        public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
         {
-            switch (type)
+            BaseBlock nextBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
+            
+            // if we can't move to the direction we are being pushed. we cannot be overtaken
+            if (!CanMoveTo(transform.position.ToVector3Int() + direction))
+            {
+                return false;
+            }
+            
+            switch (baseBlock.BlockType)
             {
                 case BlockType.Moveable:
                 case BlockType.Immovable:
@@ -38,24 +40,32 @@ namespace Runtime.Blocks
                 case BlockType.Floor:
                 case BlockType.Wall:
                 case BlockType.Hole:
-                case BlockType.Empty:
                     return false;
                 case BlockType.Player:
+                    if (nextBlock != null) return false;
                     return true;
                 default:
                     return false;
             }
         }
 
-        public override void HandleOvertakingBy(BlockData blockData, Vector3Int direction)
+        protected override bool TakeOver(BaseBlock baseBlock, Vector3Int direction)
         {
-            switch (blockData.type)
+            switch (baseBlock.BlockType)
             {
+                case BlockType.Moveable:
+                case BlockType.Immovable:
+                case BlockType.Breakable:
+                case BlockType.Meltable:
+                case BlockType.Floor:
+                case BlockType.Wall:
+                case BlockType.Hole:
+                    return false;
                 case BlockType.Player:
                     transform.position += direction;
-                    break;
+                    return true;
                 default:
-                    return;
+                    return false;
             }
         }
     }

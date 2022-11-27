@@ -52,11 +52,6 @@ public class LevelCreatorEditor : Editor
         }
         else
         {
-            if (GUILayout.Button("Save current level"))
-            {
-                levelCreator.SaveLevel();
-            }
-
             if (GUILayout.Button("Destroy current level"))
             {
                 levelCreator.DestroyCurrentMap();

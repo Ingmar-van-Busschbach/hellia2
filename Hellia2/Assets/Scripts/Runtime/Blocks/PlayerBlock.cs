@@ -8,6 +8,41 @@ using Utilities;
 
 public class PlayerBlock : BaseBlock
 {
+    public override BlockType BlockType => BlockType.Player;
+    protected override bool CanMoveTo(Vector3Int newPosition)
+    {
+        Vector3Int myPos = transform.position.ToVector3Int();
+        Vector3Int direction = newPosition - myPos;
+        
+        BaseBlock blockAtLocation = GridManager.Instance.GetBlockAt(newPosition);
+        BaseBlock floorBlockAtLocation = GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down);
+        
+        if (blockAtLocation != null)
+        {
+            if (!blockAtLocation.CanBeTakenOverBy(this, direction))
+            {
+                return false;
+            }
+        }
+
+        if (floorBlockAtLocation == null || floorBlockAtLocation.BlockType == BlockType.Hole)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
+    {
+        return false;
+    }
+
+    protected override bool TakeOver(BaseBlock baseBlock, Vector3Int direction)
+    {
+        throw new NotImplementedException();
+    }
+
     private void Update()
     {
         Vector3Int myPos = transform.position.ToVector3Int();
@@ -32,71 +67,10 @@ public class PlayerBlock : BaseBlock
             direction = Vector3Int.right;
         }
 
-        TryMove(direction);
-    }
-
-    public override bool CanMove(Vector3Int direction)
-    {
-        Vector3Int targetPos = transform.position.ToVector3Int() + direction;
-        BlockData targetBlockData = GridManager.Instance.MapData.GetBlockDataAt(targetPos);
-
-        switch (targetBlockData.type)
+        if (CanMoveTo(transform.position.ToVector3Int() + direction))
         {
-            case BlockType.Immovable:
-            case BlockType.Breakable:
-            case BlockType.Meltable:
-            case BlockType.Floor:
-            case BlockType.Wall:
-            case BlockType.Player:
-            case BlockType.Hole:
-                return false;
-            case BlockType.Empty:
-            case BlockType.Moveable:
-                return true;
-            default:
-                return false;
+            Debug.Log("Can move succesfull");
+            TryMove(transform.position.ToVector3Int() + direction, false);
         }
-    }
-
-    public override bool TryMove(Vector3Int direction)
-    {
-        Vector3Int targetPos = transform.position.ToVector3Int() + direction;
-        BlockData targetBlockData = GridManager.Instance.MapData.GetBlockDataAt(targetPos);
-        BlockData floorBlockData = GridManager.Instance.MapData.GetBlockDataAt(targetPos - Vector3Int.down);
-        BaseBlock targetBlock = GridManager.Instance.GetBlockAt(targetPos);
-        
-        Debug.LogWarning(targetBlockData.type + " : " + floorBlockData.type + " : " + direction);
-
-        switch (targetBlockData.type)
-        {
-            case BlockType.Moveable:
-            case BlockType.Immovable:
-            case BlockType.Breakable:
-            case BlockType.Meltable:
-            case BlockType.Floor:
-            case BlockType.Wall:
-            case BlockType.Player:
-            case BlockType.Hole:
-                return false;
-            case BlockType.Empty:
-                if (floorBlockData.type is BlockType.Empty or not BlockType.Hole) return false;
-                Debug.Log("yes");
-                transform.position += direction;
-                return true;
-            default:
-                return false;
-        }
-
-        return false;
-    }
-
-    public override bool CanBeOvertakenByType(BlockType type)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void HandleOvertakingBy(BlockData blockData, Vector3Int direction)
-    {
-        throw new NotImplementedException();
     }
 }

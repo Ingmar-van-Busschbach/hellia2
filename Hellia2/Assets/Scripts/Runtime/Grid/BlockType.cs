@@ -10,6 +10,5 @@ namespace Runtime.Grid
         Wall,
         Player,
         Hole,
-        Empty
     }
 }
