@@ -1,5 +1,6 @@
 using System;
 using Runtime;
+using Runtime.Grid;
 using UnityEditor;
 using UnityEditor.Graphs;
 using UnityEngine;
@@ -19,12 +20,25 @@ public class LevelCreatorEditor : Editor
     private bool _showWalls;
 
     private GameObject _selectedPlacingBlock;
-    
+    private BlockType _selectedPlacingBlockType;
+
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
         LevelCreator levelCreator = target as LevelCreator;
         if (levelCreator == null) return;
+        if (levelCreator.PrefabsContainer == null) return;
+        if (levelCreator.PrefabsContainer.DefaultFloorBlock == null)
+        {
+            Debug.LogWarning("No default floor block found");
+            return;
+        }
+
+        if (levelCreator.PrefabsContainer.PlayerPrefab == null)
+        {
+            Debug.LogWarning("No player block found");
+            return;
+        }
 
         if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock;
 
@@ -47,30 +61,40 @@ public class LevelCreatorEditor : Editor
                 levelCreator.DestroyCurrentMap();
             }
 
-            
-            DrawBlocksSection(levelCreator.PrefabsContainer.BreakablePrefabs, ref _showBreakables, "Breakable blocks");
-            DrawBlocksSection(levelCreator.PrefabsContainer.FloorPrefabs, ref _showFloors, "Floor blocks");
-            DrawBlocksSection(levelCreator.PrefabsContainer.ImmovablePrefabs, ref _showImmovables, "Immovable blocks");
-            DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks");
-            DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks");
-            DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveables blocks");
+
+            Texture2D texture =
+                GetPrefabPreview(AssetDatabase.GetAssetPath(levelCreator.PrefabsContainer.PlayerPrefab));
+            if (GUILayout.Button(texture))
+            {
+                _selectedPlacingBlock = levelCreator.PrefabsContainer.PlayerPrefab;
+                _selectedPlacingBlockType = BlockType.Player;
+            }
+
+            DrawBlocksSection(levelCreator.PrefabsContainer.BreakablePrefabs, ref _showBreakables, "Breakable blocks", BlockType.Breakable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.FloorPrefabs, ref _showFloors, "Floor blocks", BlockType.Floor);
+            DrawBlocksSection(levelCreator.PrefabsContainer.ImmovablePrefabs, ref _showImmovables, "Immovable blocks", BlockType.Immovable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks", BlockType.Meltable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks", BlockType.Wall);
+            DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveables blocks", BlockType.Moveable);
         }
     }
 
-    private void DrawBlocksSection(GameObject[] blocks, ref bool foldoutRef, string foldoutName)
+    private void DrawBlocksSection(GameObject[] blocks, ref bool foldoutRef, string foldoutName, BlockType blockType)
     {
         foldoutRef = EditorGUILayout.Foldout(foldoutRef, foldoutName);
         if (!foldoutRef) return;
-        
+
         foreach (var block in blocks)
         {
             Texture2D texture = GetPrefabPreview(AssetDatabase.GetAssetPath(block));
             if (GUILayout.Button(texture))
             {
                 _selectedPlacingBlock = block;
+                _selectedPlacingBlockType = blockType;
             }
         }
     }
+
     private void OnSceneGUI()
     {
         Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
@@ -145,7 +169,7 @@ public class LevelCreatorEditor : Editor
         EditorWindow.DestroyImmediate(editor);
         return tex;
     }
-    
+
     private void HandleInput()
     {
         int controlId = GUIUtility.GetControlID(FocusType.Passive);
@@ -153,7 +177,9 @@ public class LevelCreatorEditor : Editor
         switch (Event.current.type)
         {
             case EventType.MouseDown:
-                Vector3Int targetLocation = (_raycastHit.Value.collider.gameObject.transform.position + _raycastHit.Value.normal).ToVector3Int();
+                Vector3Int targetLocation =
+                    (_raycastHit.Value.collider.gameObject.transform.position + _raycastHit.Value.normal)
+                    .ToVector3Int();
                 LevelCreator levelCreator = target as LevelCreator;
                 if (levelCreator == null) return;
 
@@ -161,7 +187,7 @@ public class LevelCreatorEditor : Editor
 
                 if (!Event.current.control)
                 {
-                    levelCreator.PlaceBlockAt(targetLocation, _selectedPlacingBlock);
+                    levelCreator.PlaceBlockAt(targetLocation, _selectedPlacingBlock, _selectedPlacingBlockType);
                 }
                 else
                 {

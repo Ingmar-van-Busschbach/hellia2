@@ -32,21 +32,24 @@ namespace Runtime.Grid
 
         #region Saving and loading
 
-        
         public void Load(string mapName)
         {
-            if (!PlayerPrefs.HasKey(mapName))
+            string assetsPath = Application.dataPath;
+            assetsPath += $"/Data/Levels/{mapName}.txt";
+            
+            if (!System.IO.File.Exists(assetsPath))
             {
                 Debug.LogWarning($"Trying to load map ${mapName} but the map does not exist.");
                 return;
             }
-            
-            var data = JsonConvert.DeserializeObject<Dictionary<string, BlockData>>(PlayerPrefs.GetString(mapName));
+
+            var data = JsonConvert.DeserializeObject<Dictionary<string, BlockData>>(System.IO.File.ReadAllText(assetsPath));
             if (data == null)
             {
                 Debug.LogWarning($"Trying to load map ${mapName} but the data is invalid");
                 return;
             }
+
             _map.Clear();
             foreach (var (key, value) in data)
             {
@@ -60,13 +63,25 @@ namespace Runtime.Grid
             }
         }
 
+#if (UNITY_EDITOR)
         public void Save(string mapName)
         {
-            PlayerPrefs.SetString(mapName, JsonConvert.SerializeObject(_map));
-            PlayerPrefs.Save();
+            string assetsPath = Application.dataPath;
+            assetsPath += $"/Data/Levels/{mapName}.txt";
+
+            if (!System.IO.Directory.Exists($"{Application.dataPath}/Data"))
+            {
+                System.IO.Directory.CreateDirectory($"{Application.dataPath}/Data");
+            }
+            if (!System.IO.Directory.Exists($"{Application.dataPath}/Data/levels"))
+            {
+                System.IO.Directory.CreateDirectory($"{Application.dataPath}/Data/Levels");
+            }
+            
+            System.IO.File.WriteAllText(assetsPath, JsonConvert.SerializeObject(_map));
             Debug.LogWarning("Saved " + JsonConvert.SerializeObject(_map));
         }
-        
+#endif
         #endregion
     }
 }

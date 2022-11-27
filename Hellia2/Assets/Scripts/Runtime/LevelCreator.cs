@@ -43,7 +43,7 @@ namespace Runtime
             _mapData = new MapData();
         }
 
-        public void PlaceBlockAt(Vector3Int position, GameObject block)
+        public void PlaceBlockAt(Vector3Int position, GameObject block, BlockType blockType = BlockType.Floor, Direction direction = Direction.None)
         {
             if (_mapData.GetBlockAt(position).type != BlockType.Empty) return;
             
@@ -54,10 +54,11 @@ namespace Runtime
             spawnedObj.transform.parent = transform;
             _spawnedObjects.Add(spawnedObj);
             
+            Debug.Log($"Placed block of type: ${blockType}");
             _mapData.SetBlockAt(position, new BlockData()
             {
-                direction = Direction.None,
-                type = BlockType.Floor,
+                direction = direction,
+                type = blockType,
             });
         }
 

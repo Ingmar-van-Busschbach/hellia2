@@ -2,12 +2,13 @@ namespace Runtime.Grid
 {
     public enum BlockType
     {
-        Movable,
+        Moveable,
         Immovable,
         Breakable,
         Meltable,
         Floor,
         Wall,
+        Player,
         Empty
     }
 }

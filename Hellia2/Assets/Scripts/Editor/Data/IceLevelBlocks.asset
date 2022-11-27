@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6199dc1aec782f348a2e08a7fb8e5745, type: 3}
   m_Name: IceLevelBlocks
   m_EditorClassIdentifier: 
-  movablePrefabs: []
+  playerPrefab: {fileID: 4914833551948714416, guid: 3a48eaef03c36444db4e8b79c1914207, type: 3}
+  defaultFloorBlock: {fileID: 7845437167117264801, guid: dd21cb0412e200144a9124c73b1aeac8, type: 3}
+  moveablePrefabs: []
   immovablePrefabs: []
   breakablePrefabs: []
   meltablePrefabs: []
-  floorPrefabs: []
-  wallPrefabs: []
+  floorPrefabs:
+  - {fileID: 7845437167117264801, guid: dd21cb0412e200144a9124c73b1aeac8, type: 3}
+  wallPrefabs:
+  - {fileID: 2343909135027185131, guid: afc43d49fc814614191c43d947bc6e3b, type: 3}

@@ -6,6 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/BlockPrefabs", order = 1)]
 public class PrefabsContainer : ScriptableObject
 {
+    [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject defaultFloorBlock;
     [SerializeField] private GameObject[] moveablePrefabs;
     [SerializeField] private GameObject[] immovablePrefabs;
@@ -22,4 +23,5 @@ public class PrefabsContainer : ScriptableObject
     public GameObject[] WallPrefabs => wallPrefabs;
 
     public GameObject DefaultFloorBlock => defaultFloorBlock;
+    public GameObject PlayerPrefab => playerPrefab;
 }
