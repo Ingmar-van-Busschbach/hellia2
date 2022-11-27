@@ -1,5 +1,6 @@
 using System;
 using Runtime;
+using Runtime.Blocks;
 using Runtime.Grid;
 using UnityEditor;
 using UnityEditor.Graphs;
@@ -41,7 +42,7 @@ public class LevelCreatorEditor : Editor
             return;
         }
 
-        if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock;
+        if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock.gameObject;
 
         if (levelCreator.transform.childCount == 0)
         {
@@ -62,7 +63,7 @@ public class LevelCreatorEditor : Editor
                 GetPrefabPreview(AssetDatabase.GetAssetPath(levelCreator.PrefabsContainer.PlayerPrefab));
             if (GUILayout.Button(texture))
             {
-                _selectedPlacingBlock = levelCreator.PrefabsContainer.PlayerPrefab;
+                _selectedPlacingBlock = levelCreator.PrefabsContainer.PlayerPrefab.gameObject;
                 _selectedPlacingBlockType = BlockType.Player;
             }
 
@@ -76,7 +77,7 @@ public class LevelCreatorEditor : Editor
         }
     }
 
-    private void DrawBlocksSection(GameObject[] blocks, ref bool foldoutRef, string foldoutName, BlockType blockType)
+    private void DrawBlocksSection(BaseBlock[] blocks, ref bool foldoutRef, string foldoutName, BlockType blockType)
     {
         foldoutRef = EditorGUILayout.Foldout(foldoutRef, foldoutName);
         if (!foldoutRef) return;
@@ -86,7 +87,7 @@ public class LevelCreatorEditor : Editor
             Texture2D texture = GetPrefabPreview(AssetDatabase.GetAssetPath(block));
             if (GUILayout.Button(texture))
             {
-                _selectedPlacingBlock = block;
+                _selectedPlacingBlock = block.gameObject;
                 _selectedPlacingBlockType = blockType;
             }
         }

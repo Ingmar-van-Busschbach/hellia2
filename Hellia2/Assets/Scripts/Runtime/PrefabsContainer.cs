@@ -1,29 +1,30 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Runtime.Blocks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/BlockPrefabs", order = 1)]
 public class PrefabsContainer : ScriptableObject
 {
-    [SerializeField] private GameObject playerPrefab;
-    [SerializeField] private GameObject defaultFloorBlock;
-    [SerializeField] private GameObject[] moveablePrefabs;
-    [SerializeField] private GameObject[] immovablePrefabs;
-    [SerializeField] private GameObject[] breakablePrefabs;
-    [SerializeField] private GameObject[] meltablePrefabs;
-    [SerializeField] private GameObject[] floorPrefabs;
-    [SerializeField] private GameObject[] wallPrefabs;
-    [SerializeField] private GameObject[] holePrefabs;
+    [SerializeField] private BaseBlock playerPrefab;
+    [SerializeField] private BaseBlock defaultFloorBlock;
+    [SerializeField] private BaseBlock[] moveablePrefabs;
+    [SerializeField] private BaseBlock[] immovablePrefabs;
+    [SerializeField] private BaseBlock[] breakablePrefabs;
+    [SerializeField] private BaseBlock[] meltablePrefabs;
+    [SerializeField] private BaseBlock[] floorPrefabs;
+    [SerializeField] private BaseBlock[] wallPrefabs;
+    [SerializeField] private BaseBlock[] holePrefabs;
 
-    public GameObject[] HolePrefabs => holePrefabs;
-    public GameObject[] MoveablePrefabs => moveablePrefabs;
-    public GameObject[] ImmovablePrefabs => immovablePrefabs;
-    public GameObject[] BreakablePrefabs => breakablePrefabs;
-    public GameObject[] MeltablePrefabs => meltablePrefabs;
-    public GameObject[] FloorPrefabs => floorPrefabs;
-    public GameObject[] WallPrefabs => wallPrefabs;
+    public BaseBlock[] HolePrefabs => holePrefabs;
+    public BaseBlock[] MoveablePrefabs => moveablePrefabs;
+    public BaseBlock[] ImmovablePrefabs => immovablePrefabs;
+    public BaseBlock[] BreakablePrefabs => breakablePrefabs;
+    public BaseBlock[] MeltablePrefabs => meltablePrefabs;
+    public BaseBlock[] FloorPrefabs => floorPrefabs;
+    public BaseBlock[] WallPrefabs => wallPrefabs;
 
-    public GameObject DefaultFloorBlock => defaultFloorBlock;
-    public GameObject PlayerPrefab => playerPrefab;
+    public BaseBlock DefaultFloorBlock => defaultFloorBlock;
+    public BaseBlock PlayerPrefab => playerPrefab;
 }

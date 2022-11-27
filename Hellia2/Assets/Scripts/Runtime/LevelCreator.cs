@@ -30,7 +30,7 @@ namespace Runtime
             {
                 for (int j = 0; j < DefaultFloorSize; j++)
                 {
-                    PlaceBlockAt(new Vector3Int(i, DefaultFloorHeight, j), prefabsContainer.DefaultFloorBlock);
+                    PlaceBlockAt(new Vector3Int(i, DefaultFloorHeight, j), prefabsContainer.DefaultFloorBlock.gameObject);
                 }
             }
         }
