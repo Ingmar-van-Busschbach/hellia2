@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace Runtime.Grid
     {
         private readonly Dictionary<Vector3Int, BlockData> _map = new();
 
-        public BlockData GetBlockAt(Vector3Int location)
+        public BlockData GetBlockDataAt(Vector3Int location)
         {
             if (!_map.ContainsKey(location))
             {
@@ -20,16 +21,22 @@ namespace Runtime.Grid
             return _map[location];
         }
 
-        public void SetBlockAt(Vector3Int location, BlockData blockData)
+        public void SetBlockDataAt(Vector3Int location, BlockData blockData)
         {
             _map[location] = blockData;
         }
 
-        public void RemoveBlockAt(Vector3Int location)
+        public void RemoveBlockDataAt(Vector3Int location)
         {
             _map.Remove(location);
         }
 
+        public Vector3Int? GetPositionOf(BlockData blockData)
+        {
+            if (!_map.ContainsValue(blockData)) return null;
+            return _map.Keys.FirstOrDefault(location => _map[location].Equals(blockData));
+        }
+        
         #region Saving and loading
 
         public void Load(string mapName)

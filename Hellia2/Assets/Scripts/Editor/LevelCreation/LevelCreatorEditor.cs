@@ -18,6 +18,7 @@ public class LevelCreatorEditor : Editor
     private bool _showMeltables;
     private bool _showFloors;
     private bool _showWalls;
+    private bool _showHoles;
 
     private GameObject _selectedPlacingBlock;
     private BlockType _selectedPlacingBlockType;
@@ -76,6 +77,7 @@ public class LevelCreatorEditor : Editor
             DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks", BlockType.Meltable);
             DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks", BlockType.Wall);
             DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveables blocks", BlockType.Moveable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.HolePrefabs, ref _showHoles, "Hole blocks", BlockType.Hole);
         }
     }
 
@@ -108,7 +110,7 @@ public class LevelCreatorEditor : Editor
             Handles.DrawWireCube(hitObjectPosition, Vector3.one);
             if (Event.current.type == EventType.MouseMove)
             {
-                SceneView.RepaintAll();
+                HandleUtility.Repaint();
             }
 
             DrawSelectingFace(hitData, hitObjectPosition);
@@ -188,10 +190,12 @@ public class LevelCreatorEditor : Editor
                 if (!Event.current.control)
                 {
                     levelCreator.PlaceBlockAt(targetLocation, _selectedPlacingBlock, _selectedPlacingBlockType);
+                    EditorUtility.SetDirty(target);
                 }
                 else
                 {
                     levelCreator.DestroyBlock(_raycastHit.Value.collider.gameObject.transform.position.ToVector3Int());
+                    EditorUtility.SetDirty(target);
                 }
 
                 // Tell the UI your event is the main one to use, it override the selection in  the scene view

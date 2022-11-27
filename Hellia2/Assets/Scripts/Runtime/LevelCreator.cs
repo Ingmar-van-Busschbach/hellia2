@@ -45,7 +45,9 @@ namespace Runtime
 
         public void PlaceBlockAt(Vector3Int position, GameObject block, BlockType blockType = BlockType.Floor, Direction direction = Direction.None)
         {
-            if (_mapData.GetBlockAt(position).type != BlockType.Empty) return;
+            if (_mapData == null) return;
+            
+            if (_mapData.GetBlockDataAt(position).type != BlockType.Empty) return;
             
             GameObject spawnedObj = PrefabUtility.InstantiatePrefab(block) as GameObject;
             if (spawnedObj == null) return;
@@ -55,7 +57,7 @@ namespace Runtime
             _spawnedObjects.Add(spawnedObj);
             
             Debug.Log($"Placed block of type: ${blockType}");
-            _mapData.SetBlockAt(position, new BlockData()
+            _mapData.SetBlockDataAt(position, new BlockData()
             {
                 direction = direction,
                 type = blockType,
@@ -66,7 +68,7 @@ namespace Runtime
         {
             GameObject targetObj = _spawnedObjects.FirstOrDefault(o => o.transform.position.ToVector3Int() == location);
             if (targetObj == null) return;
-            _mapData.RemoveBlockAt(location);
+            _mapData.RemoveBlockDataAt(location);
             _spawnedObjects.Remove(targetObj);
             DestroyImmediate(targetObj);
         }
