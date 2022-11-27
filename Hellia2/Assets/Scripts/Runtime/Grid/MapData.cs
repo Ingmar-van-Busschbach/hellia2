@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Runtime.Grid
 {
+    [System.Serializable]
     public class MapData
     {
         private readonly Dictionary<Vector3Int, BlockData> _map = new();
@@ -22,6 +23,11 @@ namespace Runtime.Grid
         public void SetBlockAt(Vector3Int location, BlockData blockData)
         {
             _map[location] = blockData;
+        }
+
+        public void RemoveBlockAt(Vector3Int location)
+        {
+            _map.Remove(location);
         }
 
         #region Saving and loading
