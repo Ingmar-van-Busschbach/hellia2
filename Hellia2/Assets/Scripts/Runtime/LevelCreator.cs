@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Runtime.Grid;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Utilities;
@@ -11,7 +12,7 @@ namespace Runtime
     [System.Serializable]
     public class LevelCreator : MonoBehaviour
     {
-        [SerializeField] private GameObject defaultFloor;
+        [SerializeField] private PrefabsContainer prefabsContainer;
 
         private MapData _mapData;
         
@@ -22,11 +23,16 @@ namespace Runtime
         
         public void SpawnDefaultFloor()
         {
+            if (prefabsContainer.DefaultFloorBlock == null)
+            {
+                Debug.LogWarning("There is no floor block, cannot spawn the default floor.");
+                return;
+            }
             for (int i = 0; i < DefaultFloorSize; i++)
             {
                 for (int j = 0; j < DefaultFloorSize; j++)
                 {
-                    PlaceFloorBlock(new Vector3Int(i, DefaultFloorHeight, j));
+                    PlaceBlockAt(new Vector3Int(i, DefaultFloorHeight, j), prefabsContainer.DefaultFloorBlock);
                 }
             }
         }
@@ -37,9 +43,14 @@ namespace Runtime
             _mapData = new MapData();
         }
 
-        public void PlaceFloorBlock(Vector3Int position)
+        public void PlaceBlockAt(Vector3Int position, GameObject block)
         {
-            GameObject spawnedObj = Instantiate(defaultFloor, position, Quaternion.identity);
+            if (_mapData.GetBlockAt(position).type != BlockType.Empty) return;
+            
+            GameObject spawnedObj = PrefabUtility.InstantiatePrefab(block) as GameObject;
+            if (spawnedObj == null) return;
+            
+            spawnedObj.transform.position = position;
             spawnedObj.transform.parent = transform;
             _spawnedObjects.Add(spawnedObj);
             
@@ -78,5 +89,7 @@ namespace Runtime
         }
 
         public MapData MapData => _mapData;
+
+        public PrefabsContainer PrefabsContainer => prefabsContainer;
     }
 }

@@ -11,11 +11,22 @@ public class LevelCreatorEditor : Editor
 {
     private RaycastHit? _raycastHit = null;
 
+    private bool _showMoveables;
+    private bool _showImmovables;
+    private bool _showBreakables;
+    private bool _showMeltables;
+    private bool _showFloors;
+    private bool _showWalls;
+
+    private GameObject _selectedPlacingBlock;
+    
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
         LevelCreator levelCreator = target as LevelCreator;
         if (levelCreator == null) return;
+
+        if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock;
 
         if (levelCreator.transform.childCount == 0)
         {
@@ -35,9 +46,31 @@ public class LevelCreatorEditor : Editor
             {
                 levelCreator.DestroyCurrentMap();
             }
+
+            
+            DrawBlocksSection(levelCreator.PrefabsContainer.BreakablePrefabs, ref _showBreakables, "Breakable blocks");
+            DrawBlocksSection(levelCreator.PrefabsContainer.FloorPrefabs, ref _showFloors, "Floor blocks");
+            DrawBlocksSection(levelCreator.PrefabsContainer.ImmovablePrefabs, ref _showImmovables, "Immovable blocks");
+            DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks");
+            DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks");
+            DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveables blocks");
         }
     }
 
+    private void DrawBlocksSection(GameObject[] blocks, ref bool foldoutRef, string foldoutName)
+    {
+        foldoutRef = EditorGUILayout.Foldout(foldoutRef, foldoutName);
+        if (!foldoutRef) return;
+        
+        foreach (var block in blocks)
+        {
+            Texture2D texture = GetPrefabPreview(AssetDatabase.GetAssetPath(block));
+            if (GUILayout.Button(texture))
+            {
+                _selectedPlacingBlock = block;
+            }
+        }
+    }
     private void OnSceneGUI()
     {
         Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
@@ -104,6 +137,15 @@ public class LevelCreatorEditor : Editor
         Handles.DrawSolidRectangleWithOutline(verts, new Color(0.5f, 0.5f, 0.5f, 0.1f), new Color(0, 0, 0, 1));
     }
 
+    static Texture2D GetPrefabPreview(string path)
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        var editor = UnityEditor.Editor.CreateEditor(prefab);
+        Texture2D tex = editor.RenderStaticPreview(path, null, 200, 200);
+        EditorWindow.DestroyImmediate(editor);
+        return tex;
+    }
+    
     private void HandleInput()
     {
         int controlId = GUIUtility.GetControlID(FocusType.Passive);
@@ -119,7 +161,7 @@ public class LevelCreatorEditor : Editor
 
                 if (!Event.current.control)
                 {
-                    levelCreator.PlaceFloorBlock(targetLocation);
+                    levelCreator.PlaceBlockAt(targetLocation, _selectedPlacingBlock);
                 }
                 else
                 {
