@@ -37,6 +37,8 @@ namespace Runtime.Blocks
 
         private void Update()
         {
+            Camera currentCamera = Camera.current;
+
             Vector3Int myPos = transform.position.ToVector3Int();
             Vector3Int direction = Vector3Int.zero;
             if (Input.GetKeyDown(KeyCode.W))
@@ -57,6 +59,24 @@ namespace Runtime.Blocks
             if (Input.GetKeyDown(KeyCode.D))
             {
                 direction = Vector3Int.right;
+            }
+
+            Vector3Int cameraDirection = (this.transform.position - Camera.main.transform.position).normalized.ToVector3Int();
+            Debug.LogWarning(cameraDirection);
+
+            if (cameraDirection.z == -1)
+            {
+                direction = new Vector3Int(-direction.x, -direction.y, -direction.z);
+            }
+
+            if (cameraDirection.x == 1)
+            {
+                direction = new Vector3Int(direction.z, direction.y, -direction.x);
+            }
+
+            if (cameraDirection.x == -1)
+            {
+                direction = new Vector3Int(-direction.z, direction.y, direction.x);
             }
 
             if (CanMoveTo(transform.position.ToVector3Int() + direction))
