@@ -9,6 +9,5 @@ namespace Runtime.Grid
         Floor,
         Wall,
         Player,
-        Hole,
     }
 }

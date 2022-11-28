@@ -19,7 +19,6 @@ public class LevelCreatorEditor : Editor
     private bool _showMeltables;
     private bool _showFloors;
     private bool _showWalls;
-    private bool _showHoles;
 
     private GameObject _selectedPlacingBlock;
     private BlockType _selectedPlacingBlockType;
@@ -73,7 +72,6 @@ public class LevelCreatorEditor : Editor
             DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks", BlockType.Meltable);
             DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks", BlockType.Wall);
             DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveables blocks", BlockType.Moveable);
-            DrawBlocksSection(levelCreator.PrefabsContainer.HolePrefabs, ref _showHoles, "Hole blocks", BlockType.Hole);
         }
     }
 

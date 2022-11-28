@@ -22,13 +22,7 @@ namespace Runtime.Blocks
                     return false;
                 }
             }
-
-            if (floorBlockAtLocation == null || floorBlockAtLocation.BlockType == BlockType.Hole)
-            {
-                return false;
-            }
-
-            return true;
+            return floorBlockAtLocation != null;
         }
 
         public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
