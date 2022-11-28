@@ -1,3 +1,4 @@
+using System;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
@@ -14,30 +15,11 @@ namespace Runtime.Blocks
             get;
         }
 
-        protected void TryMove(Vector3Int newPosition, bool moveIfOvertakenBlock = true)
-        {
-            Vector3Int myPos = transform.position.ToVector3Int();
-            Vector3Int direction =newPosition - myPos;
-            bool overtakenBlock = false;
-            
-            BaseBlock block = GridManager.Instance.GetBlockAt(newPosition);
-            if (block != null)
-            {
-                if (!block.CanBeTakenOverBy(this, direction)) return;
-                block.TakeOver(this, direction);
-                overtakenBlock = true;
-            }
-
-            if (!moveIfOvertakenBlock && overtakenBlock) return;
-            transform.position = newPosition;
-        }
-        
         /// <summary>
-        /// Whether or not this object can move to this location. Can be used to check for specific flooring etc,
+        /// Try overtake the block at the specific position. 
         /// </summary>
-        /// <param name="newPosition">The new position the object is moving to</param>
-        /// <returns>Whether or not you can move to this position</returns>
-        protected abstract bool CanMoveTo(Vector3Int newPosition);
+        /// <param name="newPosition">The position we try to overtake</param>
+        public abstract bool TryOverTake(Vector3Int newPosition);
 
         /// <summary>
         /// Called when a block tries to overtake you. 
@@ -52,6 +34,16 @@ namespace Runtime.Blocks
         /// <param name="baseBlock">The block overtaking you</param>
         /// <param name="direction">The direction the block is moving</param>
         /// <returns></returns>
-        protected abstract bool TakeOver(BaseBlock baseBlock, Vector3Int direction);
+        public abstract bool OnGettingTakenOver(BaseBlock baseBlock, Vector3Int direction);
+
+        public BaseBlock GetBlockBeneath()
+        {
+            return GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + Vector3Int.down);
+        }
+        
+        public BaseBlock GetBlockAbove()
+        {
+            return GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + Vector3Int.up);
+        }
     }
 }

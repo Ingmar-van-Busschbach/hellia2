@@ -15,9 +15,9 @@ public class PrefabsContainer : ScriptableObject
     [SerializeField] private BaseBlock[] meltablePrefabs;
     [SerializeField] private BaseBlock[] floorPrefabs;
     [SerializeField] private BaseBlock[] wallPrefabs;
-    [SerializeField] private BaseBlock[] holePrefabs;
+    [SerializeField] private BaseBlock[] climbablePrefabs;
 
-    public BaseBlock[] HolePrefabs => holePrefabs;
+    public BaseBlock[] ClimbablePrefabs => climbablePrefabs;
     public BaseBlock[] MoveablePrefabs => moveablePrefabs;
     public BaseBlock[] ImmovablePrefabs => immovablePrefabs;
     public BaseBlock[] BreakablePrefabs => breakablePrefabs;

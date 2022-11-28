@@ -12,7 +12,8 @@ using Utilities;
 public class LevelCreatorEditor : Editor
 {
     private RaycastHit? _raycastHit = null;
-
+    
+    private bool _showClimbables;
     private bool _showMoveables;
     private bool _showImmovables;
     private bool _showBreakables;
@@ -71,7 +72,8 @@ public class LevelCreatorEditor : Editor
             DrawBlocksSection(levelCreator.PrefabsContainer.ImmovablePrefabs, ref _showImmovables, "Immovable blocks", BlockType.Immovable);
             DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks", BlockType.Meltable);
             DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks", BlockType.Wall);
-            DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveables blocks", BlockType.Moveable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveable blocks", BlockType.Moveable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.ClimbablePrefabs, ref _showClimbables, "Climbable blocks", BlockType.Climbable);
         }
     }
 

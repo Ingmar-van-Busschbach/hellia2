@@ -2,6 +2,7 @@ namespace Runtime.Grid
 {
     public enum BlockType
     {
+        Climbable,
         Moveable,
         Immovable,
         Breakable,

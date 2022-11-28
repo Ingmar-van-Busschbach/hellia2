@@ -8,7 +8,7 @@ namespace Runtime.Blocks
     public class MoveableBlock : BaseBlock
     {
         public override BlockType BlockType => BlockType.Moveable;
-        protected override bool CanMoveTo(Vector3Int newPosition)
+        public override bool TryOverTake(Vector3Int newPosition)
         {
             Vector3Int myPos = transform.position.ToVector3Int();
             Vector3Int direction = newPosition - myPos;
@@ -20,13 +20,13 @@ namespace Runtime.Blocks
             if (floorBlockAtLocation == null && !CanFallAt(myPos + direction)) return false;
             return true;
         }
-
+        
         public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
         {
             BaseBlock nextBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
             
             // if we can't move to the direction we are being pushed. we cannot be overtaken
-            if (!CanMoveTo(transform.position.ToVector3Int() + direction))
+            if (!TryOverTake(transform.position.ToVector3Int() + direction))
             {
                 return false;
             }
@@ -48,7 +48,7 @@ namespace Runtime.Blocks
             }
         }
 
-        protected override bool TakeOver(BaseBlock baseBlock, Vector3Int direction)
+        public override bool OnGettingTakenOver(BaseBlock baseBlock, Vector3Int direction)
         {
             switch (baseBlock.BlockType)
             {

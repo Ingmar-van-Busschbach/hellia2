@@ -7,22 +7,43 @@ namespace Runtime.Blocks
     public class PlayerBlock : BaseBlock
     {
         public override BlockType BlockType => BlockType.Player;
-        protected override bool CanMoveTo(Vector3Int newPosition)
+        public override bool TryOverTake(Vector3Int newPosition)
         {
             Vector3Int myPos = transform.position.ToVector3Int();
-            Vector3Int direction = newPosition - myPos;
-        
-            BaseBlock blockAtLocation = GridManager.Instance.GetBlockAt(newPosition);
-            BaseBlock floorBlockAtLocation = GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down);
-        
-            if (blockAtLocation != null)
+            Vector3Int direction =newPosition - myPos;
+
+            BaseBlock block = GridManager.Instance.GetBlockAt(newPosition);
+            if (block != null)
             {
-                if (!blockAtLocation.CanBeTakenOverBy(this, direction))
+                if (!block.CanBeTakenOverBy(this, direction))
                 {
                     return false;
+                };
+
+                if (block.BlockType == BlockType.Climbable)
+                {
+                    if (block.GetBlockAbove() == null)
+                    {
+                        transform.position = block.transform.position.ToVector3Int() + Vector3Int.up;
+                    }
+                }
+                block.OnGettingTakenOver(this, direction);
+                return true;
+            }
+            
+            if (GetBlockBeneath().BlockType == BlockType.Climbable)
+            {
+                if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) == null)
+                {
+                    if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down + Vector3Int.down) == null)
+                        return false;
+                    
+                    transform.position = newPosition + Vector3Int.down;
+                    return true;
                 }
             }
-            return floorBlockAtLocation != null;
+            transform.position = newPosition;
+            return true;
         }
 
         public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
@@ -30,7 +51,7 @@ namespace Runtime.Blocks
             return false;
         }
 
-        protected override bool TakeOver(BaseBlock baseBlock, Vector3Int direction)
+        public override bool OnGettingTakenOver(BaseBlock baseBlock, Vector3Int direction)
         {
             return false;
         }
@@ -79,11 +100,7 @@ namespace Runtime.Blocks
                 direction = new Vector3Int(-direction.z, direction.y, direction.x);
             }
 
-            if (CanMoveTo(transform.position.ToVector3Int() + direction))
-            {
-                Debug.Log("Can move succesfull");
-                TryMove(transform.position.ToVector3Int() + direction, false);
-            }
+            TryOverTake(transform.position.ToVector3Int() + direction);
         }
     }
 }

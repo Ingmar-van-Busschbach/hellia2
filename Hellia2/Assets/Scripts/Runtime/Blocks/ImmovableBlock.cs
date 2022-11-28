@@ -6,7 +6,7 @@ namespace Runtime.Blocks
     public class ImmovableBlock : BaseBlock
     {
         public override BlockType BlockType => BlockType.Immovable;
-        protected override bool CanMoveTo(Vector3Int newPosition)
+        public override bool TryOverTake(Vector3Int newPosition)
         {
             return false;
         }
@@ -16,7 +16,7 @@ namespace Runtime.Blocks
             return false;
         }
 
-        protected override bool TakeOver(BaseBlock baseBlock, Vector3Int direction)
+        public override bool OnGettingTakenOver(BaseBlock baseBlock, Vector3Int direction)
         {
             return false;
         }
