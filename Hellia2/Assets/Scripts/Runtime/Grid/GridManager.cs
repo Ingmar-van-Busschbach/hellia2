@@ -19,5 +19,17 @@ namespace Runtime.Grid
         {
             return _blocks.FirstOrDefault(block => block.transform.position.ToVector3Int() == location);
         }
+
+        public BaseBlock GetFirstBlockInDirection(Vector3Int startPos, Vector3Int direction, int maxDistance)
+        {
+            for (int i = 0; i < maxDistance; i++)
+            {
+                BaseBlock block = GetBlockAt(startPos + (direction * i));
+                if (block == null) continue;
+                return block;
+            }
+
+            return null;
+        } 
     }
 }

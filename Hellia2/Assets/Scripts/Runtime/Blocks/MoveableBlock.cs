@@ -74,36 +74,26 @@ namespace Runtime.Blocks
         /// <returns></returns>
         protected bool CanFallAt(Vector3Int location)
         {
+            GridManager gridManager = GridManager.Instance;
+         
             Vector3Int myPosition = location;
-            BaseBlock firstFloorBlock = GridManager.Instance.GetBlockAt(myPosition + (Vector3Int.down));
+            BaseBlock firstFloorBlock = gridManager.GetBlockAt(myPosition + (Vector3Int.down));
             if (firstFloorBlock != null)
             {
                 return false;
             }
-            
-            for (int i = 1; i < 10; i++)
-            {
-                BaseBlock block = GridManager.Instance.GetBlockAt(myPosition + (Vector3Int.down * i));
-                if (block != null)
-                {
-                    return true;
-                }
-            }
-            
-            return false;
+            var baseBlock = gridManager.GetFirstBlockInDirection(myPosition + Vector3Int.down,  Vector3Int.down, 10);
+            return baseBlock != null;
         }
 
         protected void DoFall()
         {
+            GridManager gridManager = GridManager.Instance;
             Vector3Int myPosition = transform.position.ToVector3Int();
-            for (int i = 1; i < 10; i++)
-            {
-                BaseBlock block = GridManager.Instance.GetBlockAt(myPosition + (Vector3Int.down * i));
-                
-                if (block == null) continue;
-                transform.position = block.transform.position.ToVector3Int() + Vector3Int.up;
-                break;
-            }
+            
+            var baseBlock = gridManager.GetFirstBlockInDirection(myPosition + Vector3Int.down,  Vector3Int.down, 10);
+            if (baseBlock == null) return;
+            transform.position = baseBlock.transform.position.ToVector3Int() + Vector3Int.up;
         }
     }
 }
