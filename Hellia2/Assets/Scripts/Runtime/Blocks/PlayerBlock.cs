@@ -30,9 +30,23 @@ namespace Runtime.Blocks
                 block.OnGettingTakenOver(this, direction);
                 return true;
             }
-            
+
+            // if there is no block... we can not stand on it.
+            if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) != null)
+            {
+                transform.position = newPosition;
+                return true;
+            } 
+           
             if (GetBlockBeneath().BlockType == BlockType.Climbable)
             {
+                ClimbableBlock climbableBlock = GetBlockBeneath() as ClimbableBlock;
+                Vector3Int reversedDirection = new Vector3Int(-direction.x, -direction.y, -direction.z);
+                
+                if (!climbableBlock!.AllowedDirections.HasFlag(reversedDirection.ToDirectionsFlag()))
+                {
+                    return false;
+                }
                 if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) == null)
                 {
                     if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down + Vector3Int.down) == null)
@@ -42,8 +56,8 @@ namespace Runtime.Blocks
                     return true;
                 }
             }
-            transform.position = newPosition;
-            return true;
+
+            return false;
         }
 
         public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)

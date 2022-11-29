@@ -1,11 +1,14 @@
 using System;
 using Runtime.Grid;
 using UnityEngine;
+using Utilities;
 
 namespace Runtime.Blocks
 {
     public class ClimbableBlock : BaseBlock
     {
+        [SerializeField] private Directions allowedDirections;
+        
         public override BlockType BlockType => BlockType.Climbable;
 
         public override bool TryOverTake(Vector3Int newPosition)
@@ -26,7 +29,8 @@ namespace Runtime.Blocks
                 case BlockType.Wall:
                     return false;
                 case BlockType.Player:
-                    return true;
+                    // The climbable needs to support this direction before we can climb it.
+                    return allowedDirections.HasFlag(direction.ToDirectionsFlag());
                 default:
                     return false;
             }
@@ -36,5 +40,7 @@ namespace Runtime.Blocks
         {
             return false;
         }
+
+        public Directions AllowedDirections => allowedDirections;
     }
 }

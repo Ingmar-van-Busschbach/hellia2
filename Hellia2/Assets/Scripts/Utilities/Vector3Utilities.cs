@@ -8,5 +8,17 @@ namespace Utilities
         {
             return new Vector3Int(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y), Mathf.RoundToInt(vector.z));
         }
+
+        public static Directions ToDirectionsFlag(this Vector3Int vector)
+        {
+            Directions directions = Directions.Nothing;
+            if (vector.x > 0) directions |= Directions.Forward;
+            if (vector.x < 0) directions |= Directions.Backward;
+            if (vector.z < 0) directions |= Directions.Right;
+            if (vector.z > 0) directions |= Directions.Left;
+            if (vector.y > 0) directions |= Directions.Up;
+            if (vector.y < 0) directions |= Directions.Down;
+            return directions;
+        }
     }
 }

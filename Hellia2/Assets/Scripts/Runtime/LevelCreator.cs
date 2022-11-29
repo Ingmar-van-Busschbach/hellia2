@@ -40,7 +40,7 @@ namespace Runtime
             transform.position = Vector3.zero;
         }
 
-        public void PlaceBlockAt(Vector3Int position, GameObject block, BlockType blockType = BlockType.Floor, Direction direction = Direction.None)
+        public void PlaceBlockAt(Vector3Int position, GameObject block, BlockType blockType = BlockType.Floor, Directions directions = Directions.Nothing)
         {
            
             GameObject spawnedObj = PrefabUtility.InstantiatePrefab(block) as GameObject;
