@@ -97,7 +97,6 @@ namespace Runtime.Blocks
             }
 
             Vector3Int cameraDirection = (this.transform.position - Camera.main.transform.position).normalized.ToVector3Int();
-            Debug.LogWarning(cameraDirection);
 
             if (cameraDirection.z == -1)
             {
