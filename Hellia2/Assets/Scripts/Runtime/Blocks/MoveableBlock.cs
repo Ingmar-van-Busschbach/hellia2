@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
@@ -7,6 +8,10 @@ namespace Runtime.Blocks
 {
     public class MoveableBlock : BaseBlock
     {
+        [SerializeField] private float fallSpeedMultiplier = 5;
+        [SerializeField] private AnimationCurve fallAnimationCurve = default;
+        
+        
         public override BlockType BlockType => BlockType.Moveable;
         public override bool TryOverTake(Vector3Int newPosition)
         {
@@ -93,7 +98,25 @@ namespace Runtime.Blocks
             
             var baseBlock = gridManager.GetFirstBlockInDirection(myPosition + Vector3Int.down,  Vector3Int.down, 10);
             if (baseBlock == null) return;
+            
+            StartCoroutine(FallAnimation(baseBlock.transform.position.ToVector3Int() + Vector3Int.up));
+            
             transform.position = baseBlock.transform.position.ToVector3Int() + Vector3Int.up;
+        }
+
+        private IEnumerator FallAnimation(Vector3Int targetPos)
+        {
+            Vector3Int startPos = transform.position.ToVector3Int();
+            float progress = 0;
+            while (progress < 1)
+            {
+                progress = Mathf.Clamp01(progress);
+
+                transform.position = Vector3.Lerp(startPos, targetPos, fallAnimationCurve.Evaluate(progress));
+                
+                progress += Time.deltaTime * fallSpeedMultiplier;
+                yield return null;
+            }
         }
     }
 }
