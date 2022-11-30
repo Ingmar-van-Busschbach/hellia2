@@ -1,3 +1,5 @@
+using System;
+using Runtime.Blocks.BlockInterfaces;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
@@ -7,68 +9,6 @@ namespace Runtime.Blocks
     public class PlayerBlock : BaseBlock
     {
         public override BlockType BlockType => BlockType.Player;
-        public override bool TryOverTake(Vector3Int newPosition)
-        {
-            Vector3Int myPos = transform.position.ToVector3Int();
-            Vector3Int direction =newPosition - myPos;
-
-            BaseBlock block = GridManager.Instance.GetBlockAt(newPosition);
-            if (block != null)
-            {
-                if (!block.CanBeTakenOverBy(this, direction))
-                {
-                    return false;
-                };
-
-                if (block.BlockType == BlockType.Climbable)
-                {
-                    if (block.GetBlockAbove() == null)
-                    {
-                        transform.position = block.transform.position.ToVector3Int() + Vector3Int.up;
-                    }
-                }
-                block.OnGettingTakenOver(this, direction);
-                return true;
-            }
-
-            // if there is no block... we can not stand on it.
-            if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) != null)
-            {
-                transform.position = newPosition;
-                return true;
-            } 
-           
-            if (GetBlockBeneath().BlockType == BlockType.Climbable)
-            {
-                ClimbableBlock climbableBlock = GetBlockBeneath() as ClimbableBlock;
-                Vector3Int reversedDirection = new Vector3Int(-direction.x, -direction.y, -direction.z);
-                
-                if (!climbableBlock!.AllowedDirections.HasFlag(reversedDirection.ToDirectionsFlag()))
-                {
-                    return false;
-                }
-                if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) == null)
-                {
-                    if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down + Vector3Int.down) == null)
-                        return false;
-                    
-                    transform.position = newPosition + Vector3Int.down;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
-        {
-            return false;
-        }
-
-        public override bool OnGettingTakenOver(BaseBlock baseBlock, Vector3Int direction)
-        {
-            return false;
-        }
 
         private void Update()
         {
@@ -112,8 +52,63 @@ namespace Runtime.Blocks
             {
                 direction = new Vector3Int(-direction.z, direction.y, direction.x);
             }
+            
+            // try move in direction
+            TryMove(direction);
+        }
 
-            TryOverTake(transform.position.ToVector3Int() + direction);
+        private void TryMove(Vector3Int direction)
+        {
+            Vector3Int myPos = transform.position.ToVector3Int();
+            BaseBlock targetBlock = GridManager.Instance.GetBlockAt(myPos + direction);
+            BaseBlock targetFloorBlock = GridManager.Instance.GetBlockAt(myPos + direction + Vector3Int.down);
+            BaseBlock targetTopBlock = GridManager.Instance.GetBlockAt(myPos + direction + Vector3Int.up);
+
+            if (targetBlock == null)
+            {
+                if (targetFloorBlock != null)
+                {
+                    transform.position = myPos + direction;
+                    return;
+                }
+                if (GetBlockBeneath().BlockType != BlockType.Climbable) return;
+                IClimbable climbable = GetBlockBeneath() as IClimbable;
+                if (climbable!.CanClimbDown(this, direction))
+                {
+                    transform.position = myPos + direction + Vector3.down;
+                }
+
+                return;
+            }
+            switch (targetBlock.BlockType)
+            {
+                case BlockType.Immovable:
+                case BlockType.Breakable:
+                case BlockType.Meltable: 
+                case BlockType.Floor:
+                case BlockType.Wall:
+                case BlockType.Player:
+                    return;
+                case BlockType.Moveable:
+                    IPushable pushable = targetBlock as IPushable;
+                    if (pushable!.CanPush(this, direction))
+                    {
+                        pushable.Push(this, direction);
+                    }
+                    break;
+                case BlockType.Climbable:
+                    IClimbable climbable = targetBlock as IClimbable;
+                    if (climbable!.CanClimbUp(this, direction))
+                    {
+                        if (targetTopBlock == null)
+                        {
+                            transform.position = myPos + direction + Vector3.up;
+                        }
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }
