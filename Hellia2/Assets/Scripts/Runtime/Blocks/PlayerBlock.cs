@@ -80,15 +80,8 @@ namespace Runtime.Blocks
 
                 return;
             }
-            switch (targetBlock.BlockType)
+            switch (targetBlock == null ? BlockType.Player : targetBlock.BlockType)
             {
-                case BlockType.Immovable:
-                case BlockType.Breakable:
-                case BlockType.Meltable: 
-                case BlockType.Floor:
-                case BlockType.Wall:
-                case BlockType.Player:
-                    return;
                 case BlockType.Moveable:
                     IPushable pushable = targetBlock as IPushable;
                     if (pushable!.CanPush(this, direction))
