@@ -12,7 +12,7 @@ using Utilities;
 public class LevelCreatorEditor : Editor
 {
     private RaycastHit? _raycastHit = null;
-
+    
     private bool _showClimbables;
     private bool _showMoveables;
     private bool _showImmovables;
@@ -42,8 +42,7 @@ public class LevelCreatorEditor : Editor
             return;
         }
 
-        if (_selectedPlacingBlock == null)
-            _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock.gameObject;
+        if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock.gameObject;
 
         if (levelCreator.transform.childCount == 0)
         {
@@ -54,6 +53,12 @@ public class LevelCreatorEditor : Editor
         }
         else
         {
+            if (GUILayout.Button("Destroy current level"))
+            {
+                levelCreator.DestroyCurrentMap();
+            }
+
+
             Texture2D texture =
                 GetPrefabPreview(AssetDatabase.GetAssetPath(levelCreator.PrefabsContainer.PlayerPrefab));
             if (GUILayout.Button(texture))
@@ -62,20 +67,13 @@ public class LevelCreatorEditor : Editor
                 _selectedPlacingBlockType = BlockType.Player;
             }
 
-            DrawBlocksSection(levelCreator.PrefabsContainer.BreakablePrefabs, ref _showBreakables, "Breakable blocks",
-                BlockType.Breakable);
-            DrawBlocksSection(levelCreator.PrefabsContainer.FloorPrefabs, ref _showFloors, "Floor blocks",
-                BlockType.Floor);
-            DrawBlocksSection(levelCreator.PrefabsContainer.ImmovablePrefabs, ref _showImmovables, "Immovable blocks",
-                BlockType.Immovable);
-            DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks",
-                BlockType.Meltable);
-            DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks",
-                BlockType.Wall);
-            DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveable blocks",
-                BlockType.Moveable);
-            DrawBlocksSection(levelCreator.PrefabsContainer.ClimbablePrefabs, ref _showClimbables, "Climbable blocks",
-                BlockType.Climbable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.BreakablePrefabs, ref _showBreakables, "Breakable blocks", BlockType.Breakable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.FloorPrefabs, ref _showFloors, "Floor blocks", BlockType.Floor);
+            DrawBlocksSection(levelCreator.PrefabsContainer.ImmovablePrefabs, ref _showImmovables, "Immovable blocks", BlockType.Immovable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks", BlockType.Meltable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks", BlockType.Wall);
+            DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveable blocks", BlockType.Moveable);
+            DrawBlocksSection(levelCreator.PrefabsContainer.ClimbablePrefabs, ref _showClimbables, "Climbable blocks", BlockType.Climbable);
         }
     }
 
