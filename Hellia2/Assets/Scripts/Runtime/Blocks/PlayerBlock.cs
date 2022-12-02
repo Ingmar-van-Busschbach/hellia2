@@ -99,8 +99,6 @@ namespace Runtime.Blocks
                         }
                     }
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
     }
