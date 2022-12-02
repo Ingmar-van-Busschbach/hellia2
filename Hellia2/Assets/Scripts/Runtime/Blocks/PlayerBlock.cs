@@ -7,6 +7,7 @@ namespace Runtime.Blocks
     public class PlayerBlock : BaseBlock
     {
         public override BlockType BlockType => BlockType.Player;
+        
         public override bool TryOverTake(Vector3Int newPosition)
         {
             Vector3Int myPos = transform.position.ToVector3Int();
@@ -113,6 +114,7 @@ namespace Runtime.Blocks
                 direction = new Vector3Int(-direction.z, direction.y, direction.x);
             }
 
+            CanMove(direction);
             TryOverTake(transform.position.ToVector3Int() + direction);
         }
     }

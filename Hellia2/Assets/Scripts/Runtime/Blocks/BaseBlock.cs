@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
@@ -10,9 +13,26 @@ namespace Runtime.Blocks
     /// </summary>
     public abstract class BaseBlock : MonoBehaviour
     {
-        public abstract BlockType BlockType
+        public abstract BlockType BlockType { get; }
+
+        protected bool CanMove(Vector3Int direction)
         {
-            get;
+            if (direction == Vector3Int.zero) return false;
+            BaseBlock baseBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
+            if (baseBlock == null) return false;
+
+            var methodes = GetMethodsBySig(baseBlock.GetType(), typeof(Boolean), this.GetType(), typeof(Vector3Int));
+            if (methodes == null || methodes.ToArray().Length == 0) return false;
+
+            bool result = (bool)methodes.First().Invoke(baseBlock, new object[] { this, direction });
+            return false;
+        }
+
+        protected void DoMove(Vector3Int direction)
+        {
+            if (!CanMove(direction)) Debug.LogWarning("[BaseBlock] Blocked move but it should be able to");
+
+            transform.position += direction;
         }
 
         /// <summary>
@@ -40,10 +60,30 @@ namespace Runtime.Blocks
         {
             return GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + Vector3Int.down);
         }
-        
+
         public BaseBlock GetBlockAbove()
         {
             return GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + Vector3Int.up);
+        }
+
+        private IEnumerable<MethodInfo> GetMethodsBySig(Type type, Type returnType, params Type[] parameterTypes)
+        {
+            return type.GetMethods().Where((m) =>
+            {
+                if (m.ReturnType != returnType) return false;
+                var parameters = m.GetParameters();
+                
+                if ((parameterTypes == null || parameterTypes.Length == 0)) return parameters.Length == 0;
+                
+                if (parameters.Length != parameterTypes.Length) return false;
+                
+                for (var i = parameterTypes.Length - 1; i >= 0; i--)
+                {
+                    if (parameters[i].ParameterType != parameterTypes[i]) return false;
+                }
+
+                return true;
+            });
         }
     }
 }

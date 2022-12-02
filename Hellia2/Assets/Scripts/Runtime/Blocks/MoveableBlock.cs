@@ -25,6 +25,18 @@ namespace Runtime.Blocks
             if (floorBlockAtLocation == null && !CanFallAt(myPos + direction)) return false;
             return true;
         }
+
+        public bool TryPushBy(PlayerBlock playerBlock, Vector3Int direction)
+        {
+            Debug.Log("Called PlayerBlock: " + playerBlock.BlockType + " : " + direction + " : " + playerBlock.GetType());
+            return true;
+        }
+        
+        public bool TryPushBy(BaseBlock playerBlock, Vector3Int direction)
+        {
+            Debug.Log("Called baseBlock: " + playerBlock.BlockType + " : " + direction + " : " + playerBlock.GetType());
+            return true;
+        }
         
         public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
         {
