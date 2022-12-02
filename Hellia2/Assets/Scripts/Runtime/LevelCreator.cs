@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Runtime.Blocks;
 using Runtime.Grid;
 using UnityEditor;
 using UnityEngine;
@@ -16,8 +17,6 @@ namespace Runtime
 
         private const int DefaultFloorSize = 5;
         private const int DefaultFloorHeight = 10;
-
-        private List<GameObject> _spawnedObjects = new();
         
         public void SpawnDefaultFloor()
         {
@@ -48,26 +47,15 @@ namespace Runtime
             
             spawnedObj.transform.position = position;
             spawnedObj.transform.parent = transform;
-            _spawnedObjects.Add(spawnedObj);
         }
 
         public void DestroyBlock(Vector3Int location)
         {
-            GameObject targetObj = _spawnedObjects.FirstOrDefault(o => o.transform.position.ToVector3Int() == location);
-            if (targetObj == null) return;
-            _spawnedObjects.Remove(targetObj);
-            DestroyImmediate(targetObj);
+            BaseBlock baseBlock = GridManager.Instance.GetBlockAt(location);
+            if (baseBlock == null) return;
+            DestroyImmediate(baseBlock);
         }
-        
-        public void DestroyCurrentMap()
-        {
-            for (int i = _spawnedObjects.Count-1; i >= 0; i--)
-            {
-                DestroyImmediate(_spawnedObjects[i]);
-            }
-            _spawnedObjects.Clear();
-        }
-        
+
         public PrefabsContainer PrefabsContainer => prefabsContainer;
     }
 }
