@@ -12,16 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6199dc1aec782f348a2e08a7fb8e5745, type: 3}
   m_Name: IceLevelBlocks
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 6024400828918938151, guid: 3a48eaef03c36444db4e8b79c1914207, type: 3}
-  defaultFloorBlock: {fileID: 3903730756539400196, guid: dd21cb0412e200144a9124c73b1aeac8, type: 3}
+  playerPrefab:
+    blockPrefab: {fileID: 6024400828918938151, guid: 3a48eaef03c36444db4e8b79c1914207, type: 3}
+    isStatic: 0
+  defaultFloorBlock:
+    blockPrefab: {fileID: 3903730756539400196, guid: dd21cb0412e200144a9124c73b1aeac8, type: 3}
+    isStatic: 1
   moveablePrefabs:
-  - {fileID: 2751080831807626084, guid: 3220c3fa20d5fc7428997780e756ed3a, type: 3}
+  - blockPrefab: {fileID: 2751080831807626084, guid: 3220c3fa20d5fc7428997780e756ed3a, type: 3}
+    isStatic: 0
   immovablePrefabs: []
   breakablePrefabs: []
   meltablePrefabs: []
   floorPrefabs:
-  - {fileID: 3903730756539400196, guid: dd21cb0412e200144a9124c73b1aeac8, type: 3}
+  - blockPrefab: {fileID: 3903730756539400196, guid: dd21cb0412e200144a9124c73b1aeac8, type: 3}
+    isStatic: 0
   wallPrefabs:
-  - {fileID: 1385742691466520514, guid: afc43d49fc814614191c43d947bc6e3b, type: 3}
+  - blockPrefab: {fileID: 1385742691466520514, guid: afc43d49fc814614191c43d947bc6e3b, type: 3}
+    isStatic: 1
   climbablePrefabs:
-  - {fileID: 2751080831807626084, guid: 055e8e9ddc899cc459b854327295def2, type: 3}
+  - blockPrefab: {fileID: 2751080831807626084, guid: 055e8e9ddc899cc459b854327295def2, type: 3}
+    isStatic: 1

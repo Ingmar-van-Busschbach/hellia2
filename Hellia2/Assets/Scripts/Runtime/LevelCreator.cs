@@ -23,7 +23,7 @@ namespace Runtime
         
         public void SpawnDefaultFloor()
         {
-            if (prefabsContainer.DefaultFloorBlock == null)
+            if (prefabsContainer.DefaultFloorBlock.blockPrefab == null)
             {
                 Debug.LogWarning("There is no floor block, cannot spawn the default floor.");
                 return;
@@ -32,7 +32,7 @@ namespace Runtime
             {
                 for (int j = 0; j < DefaultFloorSize; j++)
                 {
-                    PlaceBlockAt(new Vector3Int(i, DefaultFloorHeight, j), prefabsContainer.DefaultFloorBlock.gameObject);
+                    PlaceBlockAt(new Vector3Int(i, DefaultFloorHeight, j), prefabsContainer.DefaultFloorBlock.blockPrefab.gameObject);
                 }
             }
         }

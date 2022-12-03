@@ -1,6 +1,7 @@
 using Runtime;
 using Runtime.Blocks;
 using Runtime.Grid;
+using Runtime.LevelCreation;
 using UnityEditor;
 using UnityEngine;
 using Utilities;
@@ -29,19 +30,19 @@ namespace Editor.LevelCreation
             LevelCreator levelCreator = target as LevelCreator;
             if (levelCreator == null) return;
             if (levelCreator.PrefabsContainer == null) return;
-            if (levelCreator.PrefabsContainer.DefaultFloorBlock == null)
+            if (levelCreator.PrefabsContainer.DefaultFloorBlock.blockPrefab == null)
             {
                 Debug.LogWarning("No default floor block found");
                 return;
             }
 
-            if (levelCreator.PrefabsContainer.PlayerPrefab == null)
+            if (levelCreator.PrefabsContainer.PlayerPrefab.blockPrefab == null)
             {
                 Debug.LogWarning("No player block found");
                 return;
             }
 
-            if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock.gameObject;
+            if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock.blockPrefab.gameObject;
 
             if (levelCreator.transform.childCount == 0)
             {
@@ -59,10 +60,10 @@ namespace Editor.LevelCreation
 
 
                 Texture2D texture =
-                    GetPrefabPreview(AssetDatabase.GetAssetPath(levelCreator.PrefabsContainer.PlayerPrefab));
+                    GetPrefabPreview(AssetDatabase.GetAssetPath(levelCreator.PrefabsContainer.PlayerPrefab.blockPrefab));
                 if (GUILayout.Button(texture))
                 {
-                    _selectedPlacingBlock = levelCreator.PrefabsContainer.PlayerPrefab.gameObject;
+                    _selectedPlacingBlock = levelCreator.PrefabsContainer.PlayerPrefab.blockPrefab.gameObject;
                     _selectedPlacingBlockType = BlockType.Player;
                 }
 
@@ -76,17 +77,17 @@ namespace Editor.LevelCreation
             }
         }
 
-        private void DrawBlocksSection(BaseBlock[] blocks, ref bool foldoutRef, string foldoutName, BlockType blockType)
+        private void DrawBlocksSection(BuildBlockData[] blocks, ref bool foldoutRef, string foldoutName, BlockType blockType)
         {
             foldoutRef = EditorGUILayout.Foldout(foldoutRef, foldoutName);
             if (!foldoutRef) return;
 
             foreach (var block in blocks)
             {
-                Texture2D texture = GetPrefabPreview(AssetDatabase.GetAssetPath(block));
+                Texture2D texture = GetPrefabPreview(AssetDatabase.GetAssetPath(block.blockPrefab));
                 if (GUILayout.Button(texture))
                 {
-                    _selectedPlacingBlock = block.gameObject;
+                    _selectedPlacingBlock = block.blockPrefab.gameObject;
                     _selectedPlacingBlockType = blockType;
                 }
             }
