@@ -14,80 +14,26 @@ namespace Runtime.Blocks
         
         
         public override BlockType BlockType => BlockType.Moveable;
-        public override bool TryOverTake(Vector3Int newPosition)
+
+        [CanInteract]
+        public bool CanBePushedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
         {
-            Vector3Int myPos = transform.position.ToVector3Int();
-            Vector3Int direction = newPosition - myPos;
-        
+            Vector3Int newPosition = transform.position.ToVector3Int() + direction;
             BaseBlock blockAtLocation = GridManager.Instance.GetBlockAt(newPosition);
             BaseBlock floorBlockAtLocation = GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down);
             
             if (blockAtLocation != null) return false;
-            if (floorBlockAtLocation == null && !CanFallAt(myPos + direction)) return false;
+            if (floorBlockAtLocation == null && !CanFallAt(newPosition)) return false;
             return true;
         }
 
-        [CanInteract(typeof(PlayerBlock))]
-        public bool TryPushBy(PlayerBlock playerBlock, Vector3Int direction)
+        [DoInteract]
+        public void OnInteractedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
         {
-            Debug.Log("Called PlayerBlock: " + playerBlock.BlockType + " : " + direction + " : " + playerBlock.GetType());
-            return true;
-        }
-        
-        [TryInteract(typeof(BaseBlock))]
-        public bool TryPushBy(BaseBlock playerBlock, Vector3Int direction)
-        {
-            
-            Debug.Log("Called baseBlock: " + playerBlock.BlockType + " : " + direction + " : " + playerBlock.GetType());
-            return true;
-        }
-        
-        public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
-        {
-            BaseBlock nextBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
-            
-            // if we can't move to the direction we are being pushed. we cannot be overtaken
-            if (!TryOverTake(transform.position.ToVector3Int() + direction))
-            {
-                return false;
-            }
-            
-            switch (baseBlock.BlockType)
-            {
-                case BlockType.Moveable:
-                case BlockType.Immovable:
-                case BlockType.Breakable:
-                case BlockType.Meltable:
-                case BlockType.Floor:
-                case BlockType.Wall:
-                    return false;
-                case BlockType.Player:
-                    if (nextBlock != null) return false;
-                    return true;
-                default:
-                    return false;
-            }
+            transform.position += direction;
+            if (CanFallAt(transform.position.ToVector3Int())) DoFall();
         }
 
-        public override bool OnGettingTakenOver(BaseBlock baseBlock, Vector3Int direction)
-        {
-            switch (baseBlock.BlockType)
-            {
-                case BlockType.Moveable:
-                case BlockType.Immovable:
-                case BlockType.Breakable:
-                case BlockType.Meltable:
-                case BlockType.Floor:
-                case BlockType.Wall:
-                    return false;
-                case BlockType.Player:
-                    transform.position += direction;
-                    if (CanFallAt(transform.position.ToVector3Int())) DoFall();
-                    return true;
-                default:
-                    return false;
-            }
-        }
 
         /// <summary>
         /// Returns whether or not this object should fall down. 

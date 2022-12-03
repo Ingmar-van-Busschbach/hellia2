@@ -1,4 +1,5 @@
 using System;
+using Runtime.Blocks.Attributes;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
@@ -11,36 +12,17 @@ namespace Runtime.Blocks
         
         public override BlockType BlockType => BlockType.Climbable;
 
-        public override bool TryOverTake(Vector3Int newPosition)
+        [CanInteract]
+        public bool CanBeInteractedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
         {
-            return false;
+            return allowedDirections.HasFlag(direction.ToDirectionsFlag());
         }
 
-        public override bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction)
+        [DoInteract]
+        public void OnPlayerInteracted(PlayerBlock playerBlock, Vector3Int direction)
         {
-            switch (baseBlock.BlockType)
-            {
-                case BlockType.Climbable:
-                case BlockType.Moveable:
-                case BlockType.Immovable:
-                case BlockType.Breakable:
-                case BlockType.Meltable:
-                case BlockType.Floor:
-                case BlockType.Wall:
-                    return false;
-                case BlockType.Player:
-                    // The climbable needs to support this direction before we can climb it.
-                    return allowedDirections.HasFlag(direction.ToDirectionsFlag());
-                default:
-                    return false;
-            }
+            return;
         }
-
-        public override bool OnGettingTakenOver(BaseBlock baseBlock, Vector3Int direction)
-        {
-            return false;
-        }
-
         public Directions AllowedDirections => allowedDirections;
     }
 }

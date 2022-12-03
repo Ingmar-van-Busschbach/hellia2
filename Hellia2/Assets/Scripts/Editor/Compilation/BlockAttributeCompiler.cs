@@ -20,7 +20,12 @@ namespace Editor.Compilation
             CompilationPipeline.assemblyCompilationFinished += CheckAttributeSignatures;
         }
 
-    
+        private void OnDestroy()
+        {
+            CompilationPipeline.assemblyCompilationFinished -= CheckAttributeSignatures;
+        }
+
+
         /// <summary>
         /// Finds all instances of the BlockAttribute and checks whether the methode signatures are valid.
         /// if not it will print an error to the console so we are notified of possible bugs within our code base
@@ -37,7 +42,7 @@ namespace Editor.Compilation
             
                 if (!isValid)
                 {
-                    Debug.LogError(extractedMethode);
+                    Debug.LogWarning($"Invalid method ${extractedMethode}");
                 }
             }
         }

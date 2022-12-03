@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using Runtime.Blocks;
 using Runtime.Grid;
 using UnityEditor;
 using UnityEngine;
@@ -42,17 +44,18 @@ namespace Runtime
 
         public void PlaceBlockAt(Vector3Int position, GameObject block, BlockType blockType = BlockType.Floor, Directions directions = Directions.Nothing)
         {
-           
             GameObject spawnedObj = PrefabUtility.InstantiatePrefab(block) as GameObject;
             if (spawnedObj == null) return;
             
             spawnedObj.transform.position = position;
             spawnedObj.transform.parent = transform;
+            spawnedObj.name = $"{spawnedObj.transform.position.ToVector3Int()} : {spawnedObj.name}";
             _spawnedObjects.Add(spawnedObj);
         }
-
+        
         public void DestroyBlock(Vector3Int location)
         {
+            if (_spawnedObjects.Count == 0) _spawnedObjects = FindObjectsOfType<BaseBlock>().Select(block => block.gameObject).ToList();
             GameObject targetObj = _spawnedObjects.FirstOrDefault(o => o.transform.position.ToVector3Int() == location);
             if (targetObj == null) return;
             _spawnedObjects.Remove(targetObj);

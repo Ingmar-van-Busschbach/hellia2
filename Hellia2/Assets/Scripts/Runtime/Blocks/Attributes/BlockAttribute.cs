@@ -1,8 +1,8 @@
 using System;
-using System.Collections;
-using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
+using UnityEngine;
+
 
 namespace Runtime.Blocks.Attributes
 {
@@ -23,7 +23,7 @@ namespace Runtime.Blocks.Attributes
         /// <param name="returnType">The type this object should return</param>
         /// <param name="parameterTypes">The parameters this methode should follow.</param>
         /// <returns></returns>
-        protected bool IsValidSignature(MethodInfo m, Type returnType, params Type[] parameterTypes)
+        protected bool IsValidSignature(MethodInfo m, bool allowSubclass, Type returnType, params Type[] parameterTypes)
         {
             if (m.ReturnType != returnType) return false;
             var parameters = m.GetParameters();
@@ -34,7 +34,15 @@ namespace Runtime.Blocks.Attributes
                 
             for (var i = parameterTypes.Length - 1; i >= 0; i--)
             {
-                if (parameters[i].ParameterType != parameterTypes[i]) return false;
+                if (allowSubclass && !parameters[i].ParameterType.IsSubclassOf(parameterTypes[i]))
+                {
+                    if (parameters[i].ParameterType != parameterTypes[i]) return false;    
+                }
+
+                if (!allowSubclass)
+                {
+                    if (parameters[i].ParameterType != parameterTypes[i]) return false;    
+                }
             }
 
             return true;

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
+using Runtime.Blocks.Attributes;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
@@ -19,44 +21,48 @@ namespace Runtime.Blocks
         {
             if (direction == Vector3Int.zero) return false;
             BaseBlock baseBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
-            if (baseBlock == null) return false;
+            if (baseBlock == null) return true;
 
-            var methodes = GetMethodsBySig(baseBlock.GetType(), typeof(Boolean), this.GetType(), typeof(Vector3Int));
-           
+            var methodes = GetMethodsBySig(baseBlock.GetType(), true, typeof(CanInteractAttribute), typeof(Boolean),
+                this.GetType(), typeof(Vector3Int));
+
             var methodInfos = methodes as MethodInfo[] ?? methodes.ToArray();
             if (methodInfos.ToArray().Length == 0) return false;
 
-            bool result = (bool)methodInfos.First().Invoke(baseBlock, new object[] { this, direction });
-            return false;
+            bool result = (bool) methodInfos.First().Invoke(baseBlock, new object[] {this, direction});
+            return result;
         }
-     
+
         protected void DoMove(Vector3Int direction)
         {
-            if (!CanMove(direction)) Debug.LogWarning("[BaseBlock] Blocked move but it should be able to");
+            if (direction == Vector3Int.zero) return;
+            BaseBlock baseBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
+            if (baseBlock == null)
+            {
+                transform.position = transform.position.ToVector3Int() + direction;
+                return;
+            }
 
-            transform.position += direction;
+            var methodes = GetMethodsBySig(baseBlock.GetType(), true, typeof(DoInteractAttribute), typeof(void),
+                GetType(), typeof(Vector3Int));
+
+            var methodInfos = methodes as MethodInfo[] ?? methodes.ToArray();
+            
+            Debug.Log(0);
+            if (methodInfos.ToArray().Length == 0) return;
+
+            Debug.Log(1);
+            methodInfos.First().Invoke(baseBlock, new object[] {this, direction});
+            
+            var myMethodes = GetMethodsBySig(GetType(), false, typeof(DidInteractAttribute), typeof(Boolean), baseBlock.GetType(), typeof(Vector3Int));
+
+            var myMethodeInfo = methodes as MethodInfo[] ?? myMethodes.ToArray();
+            if (myMethodeInfo.ToArray().Length == 0) return;
+            
+            bool shouldMove = (bool) myMethodeInfo.First().Invoke(this, new object[] {baseBlock, direction});
+            if (shouldMove) transform.position = transform.position.ToVector3Int() + direction;
         }
 
-        /// <summary>
-        /// Try overtake the block at the specific position. 
-        /// </summary>
-        /// <param name="newPosition">The position we try to overtake</param>
-        public abstract bool TryOverTake(Vector3Int newPosition);
-
-        /// <summary>
-        /// Called when a block tries to overtake you. 
-        /// </summary>
-        /// <param name="baseBlock">The block trying to overtake you</param>
-        /// <param name="direction">The block's moving direction</param>
-        public abstract bool CanBeTakenOverBy(BaseBlock baseBlock, Vector3Int direction);
-
-        /// <summary>
-        /// When a block tries to overtake you, this function is called
-        /// </summary>
-        /// <param name="baseBlock">The block overtaking you</param>
-        /// <param name="direction">The direction the block is moving</param>
-        /// <returns></returns>
-        public abstract bool OnGettingTakenOver(BaseBlock baseBlock, Vector3Int direction);
 
         public BaseBlock GetBlockBeneath()
         {
@@ -68,20 +74,31 @@ namespace Runtime.Blocks
             return GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + Vector3Int.up);
         }
 
-        private IEnumerable<MethodInfo> GetMethodsBySig(Type type, Type returnType, params Type[] parameterTypes)
+        private IEnumerable<MethodInfo> GetMethodsBySig(Type type, bool allowSubclass, Type attributeType,
+            Type returnType, params Type[] parameterTypes)
         {
             return type.GetMethods().Where((m) =>
             {
                 if (m.ReturnType != returnType) return false;
                 var parameters = m.GetParameters();
-                
+
+                if (m.CustomAttributes.Count(data => data.AttributeType == attributeType) == 0) return false;
+
                 if ((parameterTypes == null || parameterTypes.Length == 0)) return parameters.Length == 0;
-                
+
                 if (parameters.Length != parameterTypes.Length) return false;
-                
+
                 for (var i = parameterTypes.Length - 1; i >= 0; i--)
                 {
-                    if (parameters[i].ParameterType != parameterTypes[i]) return false;
+                    if (allowSubclass && !parameters[i].ParameterType.IsSubclassOf(parameterTypes[i]))
+                    {
+                        if (parameters[i].ParameterType != parameterTypes[i]) return false;
+                    }
+
+                    if (!allowSubclass)
+                    {
+                        if (parameters[i].ParameterType != parameterTypes[i]) return false;
+                    }
                 }
 
                 return true;
