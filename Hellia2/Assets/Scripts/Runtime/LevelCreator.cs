@@ -45,7 +45,7 @@ namespace Runtime
 
         public void PlaceBlockAt(Vector3Int position, BuildBlockData buildBlockData)
         {
-            GameObject spawnedObj = PrefabUtility.InstantiatePrefab(buildBlockData.blockPrefab) as GameObject;
+            GameObject spawnedObj = PrefabUtility.InstantiatePrefab(buildBlockData.blockPrefab.gameObject) as GameObject;
             if (spawnedObj == null) return;
             
             spawnedObj.transform.position = position;
