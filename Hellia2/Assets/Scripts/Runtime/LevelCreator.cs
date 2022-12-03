@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Runtime.Blocks;
 using Runtime.Grid;
+using Runtime.LevelCreation;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -32,7 +33,7 @@ namespace Runtime
             {
                 for (int j = 0; j < DefaultFloorSize; j++)
                 {
-                    PlaceBlockAt(new Vector3Int(i, DefaultFloorHeight, j), prefabsContainer.DefaultFloorBlock.blockPrefab.gameObject);
+                    PlaceBlockAt(new Vector3Int(i, DefaultFloorHeight, j), prefabsContainer.DefaultFloorBlock);
                 }
             }
         }
@@ -42,13 +43,14 @@ namespace Runtime
             transform.position = Vector3.zero;
         }
 
-        public void PlaceBlockAt(Vector3Int position, GameObject block, BlockType blockType = BlockType.Floor, Directions directions = Directions.Nothing)
+        public void PlaceBlockAt(Vector3Int position, BuildBlockData buildBlockData)
         {
-            GameObject spawnedObj = PrefabUtility.InstantiatePrefab(block) as GameObject;
+            GameObject spawnedObj = PrefabUtility.InstantiatePrefab(buildBlockData.blockPrefab) as GameObject;
             if (spawnedObj == null) return;
             
             spawnedObj.transform.position = position;
             spawnedObj.transform.parent = transform;
+            spawnedObj.isStatic = buildBlockData.isStatic;
             spawnedObj.name = $"{spawnedObj.transform.position.ToVector3Int()} : {spawnedObj.name}";
             _spawnedObjects.Add(spawnedObj);
         }

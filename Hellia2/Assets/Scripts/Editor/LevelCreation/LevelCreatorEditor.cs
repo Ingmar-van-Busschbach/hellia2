@@ -21,9 +21,7 @@ namespace Editor.LevelCreation
         private bool _showFloors;
         private bool _showWalls;
 
-        private GameObject _selectedPlacingBlock;
-        private BlockType _selectedPlacingBlockType;
-
+        private BuildBlockData? _selectedPlacingBlock;
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
@@ -42,7 +40,7 @@ namespace Editor.LevelCreation
                 return;
             }
 
-            if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock.blockPrefab.gameObject;
+            if (_selectedPlacingBlock == null) _selectedPlacingBlock = levelCreator.PrefabsContainer.DefaultFloorBlock;
 
             if (levelCreator.transform.childCount == 0)
             {
@@ -63,8 +61,7 @@ namespace Editor.LevelCreation
                     GetPrefabPreview(AssetDatabase.GetAssetPath(levelCreator.PrefabsContainer.PlayerPrefab.blockPrefab));
                 if (GUILayout.Button(texture))
                 {
-                    _selectedPlacingBlock = levelCreator.PrefabsContainer.PlayerPrefab.blockPrefab.gameObject;
-                    _selectedPlacingBlockType = BlockType.Player;
+                    _selectedPlacingBlock = levelCreator.PrefabsContainer.PlayerPrefab;
                 }
 
                 DrawBlocksSection(levelCreator.PrefabsContainer.BreakablePrefabs, ref _showBreakables, "Breakable blocks", BlockType.Breakable);
@@ -87,8 +84,7 @@ namespace Editor.LevelCreation
                 Texture2D texture = GetPrefabPreview(AssetDatabase.GetAssetPath(block.blockPrefab));
                 if (GUILayout.Button(texture))
                 {
-                    _selectedPlacingBlock = block.blockPrefab.gameObject;
-                    _selectedPlacingBlockType = blockType;
+                    _selectedPlacingBlock = block;
                 }
             }
         }
@@ -185,7 +181,8 @@ namespace Editor.LevelCreation
 
                     if (!Event.current.control)
                     {
-                        levelCreator.PlaceBlockAt(targetLocation, _selectedPlacingBlock, _selectedPlacingBlockType);
+                        if (_selectedPlacingBlock == null) return;
+                        levelCreator.PlaceBlockAt(targetLocation, _selectedPlacingBlock.Value);
                         EditorUtility.SetDirty(target);
                     }
                     else
