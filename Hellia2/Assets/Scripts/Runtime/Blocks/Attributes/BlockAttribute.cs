@@ -7,6 +7,7 @@ using UnityEngine;
 namespace Runtime.Blocks.Attributes
 {
     [MeansImplicitUse]
+    [AttributeUsage(AttributeTargets.Method)]
     public abstract class BlockAttribute : Attribute
     {
         /// <summary>
