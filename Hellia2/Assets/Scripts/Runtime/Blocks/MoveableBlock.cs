@@ -1,25 +1,49 @@
 using System;
 using System.Collections;
-using Runtime.Blocks.BlockInterfaces;
+using Runtime.Blocks.Attributes;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
 
 namespace Runtime.Blocks
 {
-    public class MoveableBlock : BaseBlock, IPushable, IFallable
+    public class MoveableBlock : BaseBlock
     {
         [SerializeField] private float fallSpeedMultiplier = 5;
-        [SerializeField] private AnimationCurve fallAnimationCurve;
+        [SerializeField] private AnimationCurve fallAnimationCurve = default;
         
         
         public override BlockType BlockType => BlockType.Moveable;
 
-        public bool CanFallAt(Vector3Int fallLocation)
+        [CanInteract]
+        public bool CanBePushedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
+        {
+            Vector3Int newPosition = transform.position.ToVector3Int() + direction;
+            BaseBlock blockAtLocation = GridManager.Instance.GetBlockAt(newPosition);
+            BaseBlock floorBlockAtLocation = GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down);
+            
+            if (blockAtLocation != null) return false;
+            if (floorBlockAtLocation == null && !CanFallAt(newPosition)) return false;
+            return true;
+        }
+
+        [DoInteract]
+        public void OnInteractedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
+        {
+            transform.position += direction;
+            if (CanFallAt(transform.position.ToVector3Int())) DoFall();
+        }
+
+
+        /// <summary>
+        /// Returns whether or not this object should fall down. 
+        /// </summary>
+        /// <returns></returns>
+        protected bool CanFallAt(Vector3Int location)
         {
             GridManager gridManager = GridManager.Instance;
          
-            Vector3Int myPosition = fallLocation;
+            Vector3Int myPosition = location;
             BaseBlock firstFloorBlock = gridManager.GetBlockAt(myPosition + (Vector3Int.down));
             if (firstFloorBlock != null)
             {
@@ -29,7 +53,7 @@ namespace Runtime.Blocks
             return baseBlock != null;
         }
 
-       public void DoFall()
+        protected void DoFall()
         {
             GridManager gridManager = GridManager.Instance;
             Vector3Int myPosition = transform.position.ToVector3Int();
@@ -41,7 +65,6 @@ namespace Runtime.Blocks
             
             transform.position = baseBlock.transform.position.ToVector3Int() + Vector3Int.up;
         }
-        
 
         private IEnumerator FallAnimation(Vector3Int targetPos)
         {
@@ -56,25 +79,6 @@ namespace Runtime.Blocks
                 progress += Time.deltaTime * fallSpeedMultiplier;
                 yield return null;
             }
-        }
-
-        public bool CanPush(BaseBlock baseBlock, Vector3Int direction)
-        {
-            Vector3Int myPos = transform.position.ToVector3Int();
-            Vector3Int newPosition = myPos + direction;
-
-            BaseBlock blockAtLocation = GridManager.Instance.GetBlockAt(newPosition);
-            BaseBlock floorBlockAtLocation = GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down);
-            
-            if (blockAtLocation != null) return false;
-            if (floorBlockAtLocation == null && !CanFallAt(myPos + direction)) return false;
-            return true;
-        }
-
-        public void Push(BaseBlock baseBlock, Vector3Int direction)
-        {
-            transform.position += direction;
-            if (CanFallAt(transform.position.ToVector3Int())) DoFall();
         }
     }
 }
