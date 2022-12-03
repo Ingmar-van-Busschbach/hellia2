@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Runtime.Blocks.Attributes;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
@@ -26,14 +27,17 @@ namespace Runtime.Blocks
             return true;
         }
 
+        [CanInteract(typeof(PlayerBlock))]
         public bool TryPushBy(PlayerBlock playerBlock, Vector3Int direction)
         {
             Debug.Log("Called PlayerBlock: " + playerBlock.BlockType + " : " + direction + " : " + playerBlock.GetType());
             return true;
         }
         
+        [TryInteract(typeof(BaseBlock))]
         public bool TryPushBy(BaseBlock playerBlock, Vector3Int direction)
         {
+            
             Debug.Log("Called baseBlock: " + playerBlock.BlockType + " : " + direction + " : " + playerBlock.GetType());
             return true;
         }

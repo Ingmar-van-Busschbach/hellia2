@@ -22,12 +22,14 @@ namespace Runtime.Blocks
             if (baseBlock == null) return false;
 
             var methodes = GetMethodsBySig(baseBlock.GetType(), typeof(Boolean), this.GetType(), typeof(Vector3Int));
-            if (methodes == null || methodes.ToArray().Length == 0) return false;
+           
+            var methodInfos = methodes as MethodInfo[] ?? methodes.ToArray();
+            if (methodInfos.ToArray().Length == 0) return false;
 
-            bool result = (bool)methodes.First().Invoke(baseBlock, new object[] { this, direction });
+            bool result = (bool)methodInfos.First().Invoke(baseBlock, new object[] { this, direction });
             return false;
         }
-
+     
         protected void DoMove(Vector3Int direction)
         {
             if (!CanMove(direction)) Debug.LogWarning("[BaseBlock] Blocked move but it should be able to");
