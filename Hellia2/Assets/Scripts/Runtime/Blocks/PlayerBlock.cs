@@ -8,11 +8,11 @@ namespace Runtime.Blocks
     public class PlayerBlock : BaseBlock
     {
         public override BlockType BlockType => BlockType.Player;
-        
+
         private void Update()
         {
             Vector3Int direction = Vector3Int.zero;
-            
+
             if (Input.GetKeyDown(KeyCode.W))
             {
                 direction = Vector3Int.forward;
@@ -33,7 +33,8 @@ namespace Runtime.Blocks
                 direction = Vector3Int.right;
             }
 
-            Vector3Int cameraDirection = (this.transform.position - Camera.main.transform.position).normalized.ToVector3Int();
+            Vector3Int cameraDirection =
+                (this.transform.position - Camera.main.transform.position).normalized.ToVector3Int();
 
             if (cameraDirection.z == -1)
             {
@@ -67,8 +68,57 @@ namespace Runtime.Blocks
         [DidInteract]
         public bool DidInteractWithClimbable(ClimbableBlock climbableBlock, Vector3Int direction)
         {
-            // custom move logic.
-            transform.position = climbableBlock.transform.position.ToVector3Int() + Vector3Int.up;
+            if (climbableBlock.transform.position.ToVector3Int() == transform.position.ToVector3Int() + Vector3Int.down)
+            {
+                transform.position = climbableBlock.transform.position.ToVector3Int() + Vector3Int.up;
+            }
+            else
+            {
+                transform.position = climbableBlock.transform.position.ToVector3Int() + Vector3Int.up;
+            }
+            return false;
+        }
+
+        [CanInteract]
+        public bool CanInteractWithEmptySpace(Vector3Int direction)
+        {
+            Vector3Int newPosition = transform.position.ToVector3Int() + direction;
+
+            // there is no block we can standing... but can we climb down the block we are standing on?
+            if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) != null)
+            {
+                return true;
+            }
+            // if there is also no block beneath that we can not climb down... as we would fall down.
+            if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down * 2) == null)
+            {
+                return false;
+            }
+            
+            ClimbableBlock climbableBlock = GetBlockBeneath() as ClimbableBlock;
+            if (climbableBlock == null) return false;
+            Vector3Int reversedDirection = new Vector3Int(-direction.x, -direction.y, -direction.z);
+            return climbableBlock!.CanBeInteractedByPlayer(this, reversedDirection);
+        }
+
+        [DidInteract]
+        public bool DidInteract(Vector3Int direction)
+        {
+            Vector3Int newPosition = transform.position.ToVector3Int() + direction;
+         
+            if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) != null)
+            {
+                return true;
+            }
+            // if there is also no block beneath that we can not climb down... as we would fall down.
+            if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down * 2) == null)
+            {
+                return false;
+            }
+            
+            ClimbableBlock climbableBlock = GetBlockBeneath() as ClimbableBlock;
+            if (climbableBlock == null) return false;
+            transform.position = climbableBlock.transform.position.ToVector3Int() + direction;
             return false;
         }
     }

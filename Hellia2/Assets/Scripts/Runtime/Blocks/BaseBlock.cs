@@ -21,7 +21,15 @@ namespace Runtime.Blocks
         {
             if (direction == Vector3Int.zero) return false;
             BaseBlock baseBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
-            if (baseBlock == null) return true;
+            if (baseBlock == null)
+            {
+                var voidBlockMethodes = GetMethodsBySig(GetType(), true, typeof(CanInteractAttribute), typeof(Boolean),
+                    typeof(Vector3Int));
+                var voidBlockInfos = voidBlockMethodes as MethodInfo[] ?? voidBlockMethodes.ToArray();
+                if (voidBlockInfos.ToArray().Length == 0) return false;
+                bool canMove = (bool) voidBlockInfos.First().Invoke(this, new object[] {direction});
+                return canMove;
+            }
 
             var methodes = GetMethodsBySig(baseBlock.GetType(), true, typeof(CanInteractAttribute), typeof(Boolean),
                 this.GetType(), typeof(Vector3Int));
@@ -39,7 +47,15 @@ namespace Runtime.Blocks
             BaseBlock baseBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
             if (baseBlock == null)
             {
-                transform.position = transform.position.ToVector3Int() + direction;
+                var voidBlockMethodes = GetMethodsBySig(GetType(), true, typeof(DidInteractAttribute), typeof(Boolean),
+                    typeof(Vector3Int));
+
+                var voidBlockInfos = voidBlockMethodes as MethodInfo[] ?? voidBlockMethodes.ToArray();
+
+                if (voidBlockInfos.ToArray().Length == 0) return;
+
+                bool shouldMoveToEmpty = (bool) voidBlockInfos.First().Invoke(this, new object[] {direction});
+                if (shouldMoveToEmpty) transform.position = transform.position.ToVector3Int() + direction;
                 return;
             }
 
@@ -47,18 +63,17 @@ namespace Runtime.Blocks
                 GetType(), typeof(Vector3Int));
 
             var methodInfos = methodes as MethodInfo[] ?? methodes.ToArray();
-            
-            Debug.Log(0);
+
             if (methodInfos.ToArray().Length == 0) return;
 
-            Debug.Log(1);
             methodInfos.First().Invoke(baseBlock, new object[] {this, direction});
-            
-            var myMethodes = GetMethodsBySig(GetType(), false, typeof(DidInteractAttribute), typeof(Boolean), baseBlock.GetType(), typeof(Vector3Int));
+
+            var myMethodes = GetMethodsBySig(GetType(), false, typeof(DidInteractAttribute), typeof(Boolean),
+                baseBlock.GetType(), typeof(Vector3Int));
 
             var myMethodeInfo = methodes as MethodInfo[] ?? myMethodes.ToArray();
             if (myMethodeInfo.ToArray().Length == 0) return;
-            
+
             bool shouldMove = (bool) myMethodeInfo.First().Invoke(this, new object[] {baseBlock, direction});
             if (shouldMove) transform.position = transform.position.ToVector3Int() + direction;
         }
