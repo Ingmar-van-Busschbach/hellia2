@@ -1,63 +1,65 @@
-using System;
 using Runtime.Blocks;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+namespace Runtime.Camera
 {
-    [SerializeField] private Vector3 offset;
-    [SerializeField] private float movementSpeedMultiplier;
-    [SerializeField] private float horizontalLookAtSpeedMultiplier;
-    [SerializeField] private float verticalLookAtSpeedMultiplier;
-
-    private Vector3 _previousOffset;
-    private PlayerBlock _playerBlock;
-    private Transform _cachedTransform;
-
-    private void Awake()
+    public class CameraController : MonoBehaviour
     {
-        _cachedTransform = transform;
+        [SerializeField] private Vector3 offset;
+        [SerializeField] private float movementSpeedMultiplier;
+        [SerializeField] private float horizontalLookAtSpeedMultiplier;
+        [SerializeField] private float verticalLookAtSpeedMultiplier;
 
-        _playerBlock = FindObjectOfType<PlayerBlock>();
-        Vector3 playerPos = _playerBlock.transform.position;
+        private Vector3 _previousOffset;
+        private PlayerBlock _playerBlock;
+        private Transform _cachedTransform;
 
-        _cachedTransform.position = playerPos + offset;
-        _cachedTransform.LookAt(playerPos);
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        private void Awake()
         {
-            _previousOffset = offset;
-            offset.x = _previousOffset.z;
-            offset.z = -_previousOffset.x;
+            _cachedTransform = transform;
+
+            _playerBlock = FindObjectOfType<PlayerBlock>();
+            Vector3 playerPos = _playerBlock.transform.position;
+
+            _cachedTransform.position = playerPos + offset;
+            _cachedTransform.LookAt(playerPos);
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        private void Update()
         {
-            _previousOffset = offset;
-            offset.x = -_previousOffset.z;
-            offset.z = _previousOffset.x;
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                _previousOffset = offset;
+                offset.x = _previousOffset.z;
+                offset.z = -_previousOffset.x;
+            }
+
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                _previousOffset = offset;
+                offset.x = -_previousOffset.z;
+                offset.z = _previousOffset.x;
+            }
         }
-    }
 
-    private void LateUpdate()
-    {
-        var playerPosition = _playerBlock.transform.position;
-        var myPosition = _cachedTransform.position;
+        private void LateUpdate()
+        {
+            var playerPosition = _playerBlock.transform.position;
+            var myPosition = _cachedTransform.position;
 
-        _cachedTransform.position = Vector3.Slerp(myPosition, playerPosition + offset, Time.deltaTime * movementSpeedMultiplier);
+            _cachedTransform.position = Vector3.Slerp(myPosition, playerPosition + offset, Time.deltaTime * movementSpeedMultiplier);
 
-        var rotation = _cachedTransform.rotation;
+            var rotation = _cachedTransform.rotation;
         
-        Quaternion verticalLookOn = Quaternion.LookRotation(playerPosition - myPosition);
-        verticalLookOn.x = rotation.x;
-        verticalLookOn.z = rotation.z;
-        Quaternion horizontalLookOn = Quaternion.LookRotation(playerPosition - myPosition);
-        verticalLookOn.y = rotation.y;
+            Quaternion verticalLookOn = Quaternion.LookRotation(playerPosition - myPosition);
+            verticalLookOn.x = rotation.x;
+            verticalLookOn.z = rotation.z;
+            Quaternion horizontalLookOn = Quaternion.LookRotation(playerPosition - myPosition);
+            verticalLookOn.y = rotation.y;
         
-        rotation = Quaternion.Lerp(rotation, horizontalLookOn, Time.deltaTime * horizontalLookAtSpeedMultiplier);
-        rotation = Quaternion.Lerp(rotation, verticalLookOn, Time.deltaTime * verticalLookAtSpeedMultiplier);
-        _cachedTransform.rotation = rotation;
+            rotation = Quaternion.Lerp(rotation, horizontalLookOn, Time.deltaTime * horizontalLookAtSpeedMultiplier);
+            rotation = Quaternion.Lerp(rotation, verticalLookOn, Time.deltaTime * verticalLookAtSpeedMultiplier);
+            _cachedTransform.rotation = rotation;
+        }
     }
 }
