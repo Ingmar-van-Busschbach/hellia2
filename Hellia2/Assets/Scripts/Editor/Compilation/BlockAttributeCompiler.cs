@@ -42,7 +42,7 @@ namespace Editor.Compilation
             
                 if (!isValid)
                 {
-                    Debug.LogWarning($"Invalid method ${extractedMethode}");
+                    Debug.LogError($"Invalid method ${extractedMethode}");
                 }
             }
         }
