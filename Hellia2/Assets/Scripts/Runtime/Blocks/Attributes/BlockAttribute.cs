@@ -2,26 +2,20 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
-using Utilities;
+using JetBrains.Annotations;
 
 namespace Runtime.Blocks.Attributes
 {
+    [MeansImplicitUse]
     public abstract class BlockAttribute : Attribute
     {
+        /// <summary>
+        /// Abstract method to check if then given MethodInfo follows the required signature for this attribute
+        /// </summary>
+        /// <param name="methodInfo">The methodInfo we wish to check</param>
+        /// <returns>true is this method is setup correctly.</returns>
         public abstract bool IsValidSignature(MethodInfo methodInfo);
         
-        /// <summary>
-        /// Returns a IEnumerable with a list of methodes follow a specific signature within a class type.
-        /// </summary>
-        /// <param name="type">The type of the class</param>
-        /// <param name="returnType">the return type of the methode</param>
-        /// <param name="parameterTypes">the parameters the methode should support</param>
-        /// <returns></returns>
-        private IEnumerable GetMethodsBySig(Type type, Type returnType, params Type[] parameterTypes)
-        {
-            return type.GetMethods().Where((m) => IsValidSignature(m, returnType, parameterTypes));
-        }
-
         /// <summary>
         /// Returns whether this MethodInfo follows a certain signature.
         /// </summary>
