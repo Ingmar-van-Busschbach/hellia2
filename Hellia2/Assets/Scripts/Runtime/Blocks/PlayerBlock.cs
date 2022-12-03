@@ -116,6 +116,8 @@ namespace Runtime.Blocks
                 return false;
             }
             
+            // we moved with an empty block but we could actually move cuz there is no standable block.
+            // so we can probably climb down... are we standing on a climbable?
             ClimbableBlock climbableBlock = GetBlockBeneath() as ClimbableBlock;
             if (climbableBlock == null) return false;
             transform.position = climbableBlock.transform.position.ToVector3Int() + direction;
