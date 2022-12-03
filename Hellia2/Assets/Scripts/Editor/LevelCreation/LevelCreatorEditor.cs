@@ -112,6 +112,11 @@ namespace Editor.LevelCreation
             }
         }
 
+        /// <summary>
+        /// Draws a face on the block your point to. 
+        /// </summary>
+        /// <param name="hitData"></param>
+        /// <param name="hitObjectPosition"></param>
         private void DrawSelectingFace(RaycastHit hitData, Vector3 hitObjectPosition)
         {
             Vector3[] verts = new Vector3[4];
@@ -153,6 +158,11 @@ namespace Editor.LevelCreation
             Handles.DrawSolidRectangleWithOutline(verts, new Color(0.5f, 0.5f, 0.5f, 0.1f), new Color(0, 0, 0, 1));
         }
 
+        /// <summary>
+        /// Get's a preview texture from a prefab. 
+        /// </summary>
+        /// <param name="path">The path to the prefab object</param>
+        /// <returns>A Texture2D object where to prefab is rendered in</returns>
         static Texture2D GetPrefabPreview(string path)
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
@@ -162,6 +172,9 @@ namespace Editor.LevelCreation
             return tex;
         }
 
+        /// <summary>
+        /// Handles user input and decides what actions to take with specific input types.
+        /// </summary>
         private void HandleInput()
         {
             int controlId = GUIUtility.GetControlID(FocusType.Passive);
