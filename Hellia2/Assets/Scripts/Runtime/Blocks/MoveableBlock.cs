@@ -11,9 +11,7 @@ namespace Runtime.Blocks
     {
         [SerializeField] private float fallSpeedMultiplier = 5;
         [SerializeField] private AnimationCurve fallAnimationCurve = default;
-        
-        
-        public override BlockType BlockType => BlockType.Moveable;
+
 
         [CanInteract]
         public bool CanBePushedByPlayer(PlayerBlock playerBlock, Vector3Int direction)

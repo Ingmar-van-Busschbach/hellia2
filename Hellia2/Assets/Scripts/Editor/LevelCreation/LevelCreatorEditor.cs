@@ -64,17 +64,17 @@ namespace Editor.LevelCreation
                     _selectedPlacingBlock = levelCreator.PrefabsContainer.PlayerPrefab;
                 }
 
-                DrawBlocksSection(levelCreator.PrefabsContainer.BreakablePrefabs, ref _showBreakables, "Breakable blocks", BlockType.Breakable);
-                DrawBlocksSection(levelCreator.PrefabsContainer.FloorPrefabs, ref _showFloors, "Floor blocks", BlockType.Floor);
-                DrawBlocksSection(levelCreator.PrefabsContainer.ImmovablePrefabs, ref _showImmovables, "Immovable blocks", BlockType.Immovable);
-                DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks", BlockType.Meltable);
-                DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks", BlockType.Wall);
-                DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveable blocks", BlockType.Moveable);
-                DrawBlocksSection(levelCreator.PrefabsContainer.ClimbablePrefabs, ref _showClimbables, "Climbable blocks", BlockType.Climbable);
+                DrawBlocksSection(levelCreator.PrefabsContainer.BreakablePrefabs, ref _showBreakables, "Breakable blocks");
+                DrawBlocksSection(levelCreator.PrefabsContainer.FloorPrefabs, ref _showFloors, "Floor blocks");
+                DrawBlocksSection(levelCreator.PrefabsContainer.ImmovablePrefabs, ref _showImmovables, "Immovable blocks");
+                DrawBlocksSection(levelCreator.PrefabsContainer.MeltablePrefabs, ref _showMeltables, "Meltable blocks");
+                DrawBlocksSection(levelCreator.PrefabsContainer.WallPrefabs, ref _showWalls, "Walls blocks");
+                DrawBlocksSection(levelCreator.PrefabsContainer.MoveablePrefabs, ref _showMoveables, "Moveable blocks");
+                DrawBlocksSection(levelCreator.PrefabsContainer.ClimbablePrefabs, ref _showClimbables, "Climbable blocks");
             }
         }
 
-        private void DrawBlocksSection(BuildBlockData[] blocks, ref bool foldoutRef, string foldoutName, BlockType blockType)
+        private void DrawBlocksSection(BuildBlockData[] blocks, ref bool foldoutRef, string foldoutName)
         {
             foldoutRef = EditorGUILayout.Foldout(foldoutRef, foldoutName);
             if (!foldoutRef) return;

@@ -7,8 +7,6 @@ namespace Runtime.Blocks
 {
     public class PlayerBlock : BaseBlock
     {
-        public override BlockType BlockType => BlockType.Player;
-
         private void Update()
         {
             Vector3Int direction = Vector3Int.zero;

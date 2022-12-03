@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using JetBrains.Annotations;
 using Runtime.Blocks.Attributes;
 using Runtime.Grid;
 using UnityEngine;
@@ -15,8 +14,6 @@ namespace Runtime.Blocks
     /// </summary>
     public abstract class BaseBlock : MonoBehaviour
     {
-        public abstract BlockType BlockType { get; }
-
         protected bool CanMove(Vector3Int direction)
         {
             if (direction == Vector3Int.zero) return false;
