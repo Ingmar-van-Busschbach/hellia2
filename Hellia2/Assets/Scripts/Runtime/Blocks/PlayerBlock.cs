@@ -7,6 +7,13 @@ namespace Runtime.Blocks
 {
     public class PlayerBlock : BaseBlock
     {
+        private UnityEngine.Camera _mainCamera;
+
+        private void Awake()
+        {
+            _mainCamera = UnityEngine.Camera.main;
+        }
+
         private void Update()
         {
             Vector3Int direction = Vector3Int.zero;
@@ -32,7 +39,7 @@ namespace Runtime.Blocks
             }
 
             Vector3Int cameraDirection =
-                (this.transform.position - Camera.main.transform.position).normalized.ToVector3Int();
+                (this.transform.position - _mainCamera.transform.position).normalized.ToVector3Int();
 
             if (cameraDirection.z == -1)
             {
@@ -73,6 +80,7 @@ namespace Runtime.Blocks
             {
                 transform.position = climbableBlock.transform.position.ToVector3Int() + Vector3Int.up;
             }
+
             return false;
         }
 
@@ -86,12 +94,13 @@ namespace Runtime.Blocks
             {
                 return true;
             }
+
             // if there is also no block beneath that we can not climb down... as we would fall down.
             if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down * 2) == null)
             {
                 return false;
             }
-            
+
             ClimbableBlock climbableBlock = GetBlockBeneath() as ClimbableBlock;
             if (climbableBlock == null) return false;
             Vector3Int reversedDirection = new Vector3Int(-direction.x, -direction.y, -direction.z);
@@ -102,17 +111,18 @@ namespace Runtime.Blocks
         public bool DidInteract(Vector3Int direction)
         {
             Vector3Int newPosition = transform.position.ToVector3Int() + direction;
-         
+
             if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) != null)
             {
                 return true;
             }
+
             // if there is also no block beneath that we can not climb down... as we would fall down.
             if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down * 2) == null)
             {
                 return false;
             }
-            
+
             // we moved with an empty block but we could actually move cuz there is no standable block.
             // so we can probably climb down... are we standing on a climbable?
             ClimbableBlock climbableBlock = GetBlockBeneath() as ClimbableBlock;
