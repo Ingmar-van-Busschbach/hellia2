@@ -61,7 +61,6 @@ namespace Runtime.Blocks
         [DidInteract]
         public bool DidInteractWithMoveAble(MoveableBlock block, Vector3Int direction)
         {
-            Debug.Log("Player interacted with a MoveAble block");
             return false;
         }
 

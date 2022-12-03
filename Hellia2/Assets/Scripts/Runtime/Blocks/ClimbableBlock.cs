@@ -21,7 +21,6 @@ namespace Runtime.Blocks
         [DoInteract]
         public void OnPlayerInteracted(PlayerBlock playerBlock, Vector3Int direction)
         {
-            return;
         }
         public Directions AllowedDirections => allowedDirections;
     }
