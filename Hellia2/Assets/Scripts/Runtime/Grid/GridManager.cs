@@ -33,6 +33,12 @@ namespace Runtime.Grid
             block.transform.position = newPosition;
             onBlockMoved?.Invoke();
         }
+
+        public void DestroyBlock(BaseBlock block)
+        {
+            _blocks.Remove(block.transform.position.ToVector3Int());
+            Destroy(block.gameObject);
+        }
         
         public BaseBlock GetBlockAt(Vector3Int location)
         {

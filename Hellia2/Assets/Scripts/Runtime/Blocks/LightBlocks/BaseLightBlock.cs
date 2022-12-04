@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using JetBrains.Annotations;
 using Runtime.Data;
 using Runtime.Grid;
 using UnityEngine;
@@ -57,6 +60,7 @@ namespace Runtime.Blocks.LightBlocks
             }
         }
 
+        [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
         protected virtual LightEmitData EmitLight(Vector3Int direction)
         {
             LightEmitData data = new LightEmitData(direction, this,
@@ -71,6 +75,13 @@ namespace Runtime.Blocks.LightBlocks
             if (hittedBlock == null) return data;
             data.HitBlock = hittedBlock;
             data.HitPosition = hittedBlock.transform.position.ToVector3Int();
+
+            if (hittedBlock.GetType().GetInterfaces().Contains(typeof(ILightReceiver)))
+            {
+                ILightReceiver receiver = hittedBlock as ILightReceiver ;
+                receiver!.ReceiveLight();
+            }
+            
             if (!hittedBlock.GetType().IsSubclassOf(typeof(BaseLightBlock))) return data;
 
             ((BaseLightBlock) data.HitBlock).ReceiveLight(data);
