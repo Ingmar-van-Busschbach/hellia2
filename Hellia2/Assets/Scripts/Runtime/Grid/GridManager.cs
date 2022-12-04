@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Runtime.Blocks;
@@ -9,16 +10,29 @@ namespace Runtime.Grid
 {
     public class GridManager : SingletonMonoBehaviour<GridManager>
     {
-        private BaseBlock[] _blocks;
+        private Dictionary<Vector3Int, BaseBlock> _blocks = new();
 
         private void Awake()
         {
-            _blocks = FindObjectsOfType<BaseBlock>();
+            foreach (var baseBlock in FindObjectsOfType<BaseBlock>())
+            {
+                _blocks.Add(baseBlock.transform.position.ToVector3Int(), baseBlock);
+                baseBlock.transform.hasChanged = false;
+            }
         }
 
+        public void Move(BaseBlock block, Vector3Int newPosition)
+        {
+            Vector3Int oldPosition = block.transform.position.ToVector3Int();
+            var value = _blocks[oldPosition];
+            _blocks.Remove(oldPosition);
+            _blocks[newPosition] = value;
+            block.transform.position = newPosition;
+        }
+        
         public BaseBlock GetBlockAt(Vector3Int location)
         {
-            return _blocks.FirstOrDefault(block => block.transform.position.ToVector3Int() == location);
+            return _blocks.ContainsKey(location) ? _blocks[location] : null;
         }
 
         public BaseBlock GetFirstBlockInDirection(Vector3Int startPos, Vector3Int direction, int maxDistance)

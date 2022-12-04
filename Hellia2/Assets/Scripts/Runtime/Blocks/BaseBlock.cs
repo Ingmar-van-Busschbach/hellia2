@@ -52,7 +52,7 @@ namespace Runtime.Blocks
                 if (voidBlockInfos.ToArray().Length == 0) return;
 
                 bool shouldMoveToEmpty = (bool) voidBlockInfos.First().Invoke(this, new object[] {direction});
-                if (shouldMoveToEmpty) transform.position = transform.position.ToVector3Int() + direction;
+                if (shouldMoveToEmpty) GridManager.Instance.Move(this, transform.position.ToVector3Int() + direction);
                 return;
             }
 
@@ -72,7 +72,7 @@ namespace Runtime.Blocks
             if (myMethodeInfo.ToArray().Length == 0) return;
 
             bool shouldMove = (bool) myMethodeInfo.First().Invoke(this, new object[] {baseBlock, direction});
-            if (shouldMove) transform.position = transform.position.ToVector3Int() + direction;
+            if (shouldMove) GridManager.Instance.Move(this, transform.position.ToVector3Int() + direction);
         }
 
 

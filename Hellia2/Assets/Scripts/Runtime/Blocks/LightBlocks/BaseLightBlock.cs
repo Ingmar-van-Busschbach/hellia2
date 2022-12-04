@@ -16,8 +16,11 @@ namespace Runtime.Blocks.LightBlocks
         [SerializeField] private Directions receiveDirections;
         [SerializeField] private int maxLightDistance = 50;
 
+        public UnityEvent<Vector3Int> stopEmittingTo = new();
+        public UnityEvent<LightEmitData> onEmitLight = new();
         public UnityEvent onFirstLightReceived = new();
         public UnityEvent onLastLightLost = new();
+
 
         protected readonly Dictionary<Vector3Int, BaseLightBlock> ReceivingFrom = new();
         protected readonly Dictionary<Vector3Int, BaseLightBlock> EmittingTo = new();
@@ -26,13 +29,13 @@ namespace Runtime.Blocks.LightBlocks
         {
             LightReceiveData receiveData = new LightReceiveData();
             if (canReceive == false) return receiveData;
-            
+
             if (!ReceivingFrom.ContainsKey(emitData.Direction))
             {
                 ReceivingFrom[emitData.Direction] = emitData.Emitter;
                 if (ReceivingFrom.Keys.Count == 1) onFirstLightReceived?.Invoke();
             }
-            
+
             return receiveData;
         }
 
@@ -82,11 +85,14 @@ namespace Runtime.Blocks.LightBlocks
                 if (!CanEmitTo(value)) continue;
                 LightEmitData emitData = EmitLight(value.ToVector3Int());
 
+                onEmitLight?.Invoke(emitData);
+
                 if (!emitData.HitLightBlock) continue;
                 BaseLightBlock lightBlock = emitData.HitBlock as BaseLightBlock;
                 foundBlocks.Add(lightBlock);
                 if (!EmittingTo.ContainsKey(value.ToVector3Int())) EmittingTo.Add(value.ToVector3Int(), lightBlock);
             }
+
             CheckStopEmitting(foundBlocks);
         }
 
@@ -103,7 +109,22 @@ namespace Runtime.Blocks.LightBlocks
                 EmittingTo[emittingToKey].StopReceiveLight(new LightLoseData(emittingToKey, EmittingTo[emittingToKey]));
                 toRemove.Add(emittingToKey);
             }
+
             toRemove.ForEach(i => EmittingTo.Remove(i));
         }
+
+        #region Public getters
+
+        public bool CanEmit => canEmit;
+
+        public bool CanReceive => canReceive;
+
+        public Directions ReceiveDirections => receiveDirections;
+
+        public Directions EmitDirections => emitDirections;
+
+        public int MAXLightDistance => maxLightDistance;
+
+        #endregion
     }
 }

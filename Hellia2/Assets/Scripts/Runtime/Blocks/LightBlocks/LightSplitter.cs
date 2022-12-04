@@ -16,7 +16,8 @@ namespace Runtime.Blocks.LightBlocks
             
             return !ReceivingFrom.Any(keyValuePair => directions.HasFlag(keyValuePair.Key.ToDirectionsFlag().Flip()));
         }
-
+        
+        
         protected override LightEmitData EmitLight(Vector3Int direction)
         {
             LightEmitData data = base.EmitLight(direction);

@@ -28,7 +28,7 @@ namespace Runtime.Blocks
         [DoInteract]
         public void OnInteractedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
         {
-            transform.position += direction;
+            GridManager.Instance.Move(this, transform.position.ToVector3Int() + direction);
             if (CanFallAt(transform.position.ToVector3Int())) DoFall();
         }
 
@@ -58,25 +58,9 @@ namespace Runtime.Blocks
             
             var baseBlock = gridManager.GetFirstBlockInDirection(myPosition + Vector3Int.down,  Vector3Int.down, 10);
             if (baseBlock == null) return;
-            
-            StartCoroutine(FallAnimation(baseBlock.transform.position.ToVector3Int() + Vector3Int.up));
-            
-            transform.position = baseBlock.transform.position.ToVector3Int() + Vector3Int.up;
-        }
 
-        private IEnumerator FallAnimation(Vector3Int targetPos)
-        {
-            Vector3Int startPos = transform.position.ToVector3Int();
-            float progress = 0;
-            while (progress < 1)
-            {
-                progress = Mathf.Clamp01(progress);
-
-                transform.position = Vector3.Lerp(startPos, targetPos, fallAnimationCurve.Evaluate(progress));
-                
-                progress += Time.deltaTime * fallSpeedMultiplier;
-                yield return null;
-            }
+            GridManager.Instance.Move(this, baseBlock.transform.position.ToVector3Int() + Vector3Int.up);
         }
+        
     }
 }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7006472441724657962}
   - component: {fileID: 5010507795883819204}
   - component: {fileID: 8069258287306655700}
+  - component: {fileID: 4711397087022442765}
   m_Layer: 0
   m_Name: LightSplitter
   m_TagString: Untagged
@@ -115,3 +116,25 @@ MonoBehaviour:
   canReceive: 1
   receiveDirections: 0
   maxLightDistance: 50
+  onEmitLight:
+    m_PersistentCalls:
+      m_Calls: []
+  onFirstLightReceived:
+    m_PersistentCalls:
+      m_Calls: []
+  onLastLightLost:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &4711397087022442765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5900714311461322406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4330b2f3815718c43a2777910cefff11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineRendererPrefab: {fileID: 8211689469748454582, guid: 3bcd12e75aeb6ec43b7a132f02d1e451, type: 3}
