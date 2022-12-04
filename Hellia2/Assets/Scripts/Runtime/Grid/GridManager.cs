@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Runtime.Blocks;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Utilities;
 
@@ -11,6 +12,8 @@ namespace Runtime.Grid
     public class GridManager : SingletonMonoBehaviour<GridManager>
     {
         private Dictionary<Vector3Int, BaseBlock> _blocks = new();
+
+        public UnityEvent onBlockMoved = new();
 
         private void Awake()
         {
@@ -28,6 +31,7 @@ namespace Runtime.Grid
             _blocks.Remove(oldPosition);
             _blocks[newPosition] = value;
             block.transform.position = newPosition;
+            onBlockMoved?.Invoke();
         }
         
         public BaseBlock GetBlockAt(Vector3Int location)
