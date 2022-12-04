@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Runtime.Data;
 using Runtime.Grid;
@@ -41,7 +42,13 @@ namespace Runtime.Blocks.LightBlocks
 
         protected virtual void StopReceiveLight(LightLoseData emitData)
         {
-            if (canReceive == false) return;
+            StartCoroutine(DelayedStopReceive(emitData));
+        }
+
+        private IEnumerator DelayedStopReceive(LightLoseData emitData)
+        {
+            yield return null;
+            if (canReceive == false) yield break;
             if (ReceivingFrom.ContainsKey(emitData.Direction)) ReceivingFrom.Remove(emitData.Direction);
 
             if (ReceivingFrom.Keys.Count == 0)
