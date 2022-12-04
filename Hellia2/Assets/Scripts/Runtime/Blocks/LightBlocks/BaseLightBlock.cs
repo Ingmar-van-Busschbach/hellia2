@@ -16,8 +16,8 @@ namespace Runtime.Blocks.LightBlocks
         [SerializeField] private Directions receiveDirections;
         [SerializeField] private int maxLightDistance = 50;
 
-        public UnityEvent onFirstLightReceived = new UnityEvent();
-        public UnityEvent onLastLightLost = new UnityEvent();
+        public UnityEvent onFirstLightReceived = new();
+        public UnityEvent onLastLightLost = new();
 
         protected readonly Dictionary<Vector3Int, BaseLightBlock> ReceivingFrom = new();
         protected readonly Dictionary<Vector3Int, BaseLightBlock> EmittingTo = new();
