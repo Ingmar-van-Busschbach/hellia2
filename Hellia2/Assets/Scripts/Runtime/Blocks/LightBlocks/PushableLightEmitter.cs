@@ -7,8 +7,6 @@ namespace Runtime.Blocks.LightBlocks
 {
     public class PushableLightEmitter : LightEmitter
     {
-   
-
         [CanInteract]
         public bool CanBePushedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
         {
