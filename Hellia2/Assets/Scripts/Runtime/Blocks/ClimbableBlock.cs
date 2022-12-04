@@ -12,7 +12,7 @@ namespace Runtime.Blocks
         [CanInteract]
         public bool CanBeInteractedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
         {
-            return allowedDirections.HasFlag(direction.ToDirectionsFlag());
+            return allowedDirections.HasFlag(direction.ToDirectionsFlag().Flip());
         }
 
         [DoInteract]

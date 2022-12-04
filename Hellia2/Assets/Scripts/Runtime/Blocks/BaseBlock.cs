@@ -20,22 +20,10 @@ namespace Runtime.Blocks
             BaseBlock baseBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
             if (baseBlock == null)
             {
-                var voidBlockMethodes = GetMethodsBySig(GetType(), true, typeof(CanInteractAttribute), typeof(Boolean),
-                    typeof(Vector3Int));
-                var voidBlockInfos = voidBlockMethodes as MethodInfo[] ?? voidBlockMethodes.ToArray();
-                if (voidBlockInfos.ToArray().Length == 0) return false;
-                bool canMove = (bool) voidBlockInfos.First().Invoke(this, new object[] {direction});
-                return canMove;
+                return CanMoveToEmpty(direction);
             }
 
-            var methodes = GetMethodsBySig(baseBlock.GetType(), true, typeof(CanInteractAttribute), typeof(Boolean),
-                this.GetType(), typeof(Vector3Int));
-
-            var methodInfos = methodes as MethodInfo[] ?? methodes.ToArray();
-            if (methodInfos.ToArray().Length == 0) return false;
-
-            bool result = (bool) methodInfos.First().Invoke(baseBlock, new object[] {this, direction});
-            return result;
+            return InvokeCanInteract(baseBlock, direction);
         }
 
         protected void DoMove(Vector3Int direction)
@@ -44,37 +32,61 @@ namespace Runtime.Blocks
             BaseBlock baseBlock = GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + direction);
             if (baseBlock == null)
             {
-                var voidBlockMethodes = GetMethodsBySig(GetType(), true, typeof(DidInteractAttribute), typeof(Boolean),
-                    typeof(Vector3Int));
-
-                var voidBlockInfos = voidBlockMethodes as MethodInfo[] ?? voidBlockMethodes.ToArray();
-
-                if (voidBlockInfos.ToArray().Length == 0) return;
-
-                bool shouldMoveToEmpty = (bool) voidBlockInfos.First().Invoke(this, new object[] {direction});
-                if (shouldMoveToEmpty) GridManager.Instance.Move(this, transform.position.ToVector3Int() + direction);
+                DoMoveEmpty(direction);
                 return;
             }
 
-            var methodes = GetMethodsBySig(baseBlock.GetType(), true, typeof(DoInteractAttribute), typeof(void),
+            InvokeDoInteraction(baseBlock, direction);
+            InvokeDidInteraction(baseBlock, direction);
+        }
+
+        private bool InvokeCanInteract(BaseBlock baseBlock, Vector3Int direction)
+        {
+            var method = GetMethodBySig(baseBlock.GetType(), true, typeof(CanInteractAttribute), typeof(Boolean),
+                this.GetType(), typeof(Vector3Int));
+            if (method == null) return false;
+ 
+            bool result = (bool) method.Invoke(baseBlock, new object[] {this, direction});
+            return result;
+        }
+        
+        private void InvokeDoInteraction(BaseBlock baseBlock, Vector3Int direction)
+        {
+            MethodInfo method = GetMethodBySig(baseBlock.GetType(), true, typeof(DoInteractAttribute), typeof(void),
                 GetType(), typeof(Vector3Int));
+            if (method == null) return;
 
-            var methodInfos = methodes as MethodInfo[] ?? methodes.ToArray();
+            method.Invoke(baseBlock, new object[] {this, direction});
+        }
 
-            if (methodInfos.ToArray().Length == 0) return;
-
-            methodInfos.First().Invoke(baseBlock, new object[] {this, direction});
-
-            var myMethodes = GetMethodsBySig(GetType(), false, typeof(DidInteractAttribute), typeof(Boolean),
+        private void InvokeDidInteraction(BaseBlock baseBlock, Vector3Int direction)
+        {
+            var method = GetMethodBySig(GetType(), false, typeof(DidInteractAttribute), typeof(Boolean),
                 baseBlock.GetType(), typeof(Vector3Int));
+            if (method == null) return;
 
-            var myMethodeInfo = methodes as MethodInfo[] ?? myMethodes.ToArray();
-            if (myMethodeInfo.ToArray().Length == 0) return;
-
-            bool shouldMove = (bool) myMethodeInfo.First().Invoke(this, new object[] {baseBlock, direction});
+            bool shouldMove = (bool) method.Invoke(this, new object[] {baseBlock, direction});
             if (shouldMove) GridManager.Instance.Move(this, transform.position.ToVector3Int() + direction);
         }
 
+        private bool CanMoveToEmpty(Vector3Int direction)
+        {
+            var method = GetMethodBySig(GetType(), true, typeof(CanInteractAttribute), typeof(Boolean),
+                typeof(Vector3Int));
+            if (method == null) return false;
+            bool canMove = (bool) method.Invoke(this, new object[] {direction});
+            return canMove;
+        }
+
+        private void DoMoveEmpty(Vector3Int direction)
+        {
+            var method = GetMethodBySig(GetType(), true, typeof(DidInteractAttribute), typeof(Boolean),
+                typeof(Vector3Int));
+            if (method == null) return;
+
+            bool shouldMoveToEmpty = (bool) method.Invoke(this, new object[] {direction});
+            if (shouldMoveToEmpty) GridManager.Instance.Move(this, transform.position.ToVector3Int() + direction);
+        }
 
         public BaseBlock GetBlockBeneath()
         {
@@ -86,10 +98,10 @@ namespace Runtime.Blocks
             return GridManager.Instance.GetBlockAt(transform.position.ToVector3Int() + Vector3Int.up);
         }
 
-        private IEnumerable<MethodInfo> GetMethodsBySig(Type type, bool allowSubclass, Type attributeType,
-            Type returnType, params Type[] parameterTypes)
+        private MethodInfo GetMethodBySig(Type type, bool allowSubclass, Type attributeType, Type returnType,
+            params Type[] parameterTypes)
         {
-            return type.GetMethods().Where((m) =>
+            var firstMethod = type.GetMethods().FirstOrDefault((m) =>
             {
                 if (m.ReturnType != returnType) return false;
                 var parameters = m.GetParameters();
@@ -115,6 +127,8 @@ namespace Runtime.Blocks
 
                 return true;
             });
+            return firstMethod;
         }
+        
     }
 }
