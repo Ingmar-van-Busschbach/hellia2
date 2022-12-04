@@ -26,8 +26,7 @@ namespace Runtime.Blocks.LightBlocks
         {
             LightReceiveData receiveData = new LightReceiveData();
             if (canReceive == false) return receiveData;
-            if (receiveDirections.HasFlag(emitData.Direction.ToDirectionsFlag().Flip())) return receiveData;
-
+            
             if (!ReceivingFrom.ContainsKey(emitData.Direction))
             {
                 ReceivingFrom[emitData.Direction] = emitData.Emitter;
