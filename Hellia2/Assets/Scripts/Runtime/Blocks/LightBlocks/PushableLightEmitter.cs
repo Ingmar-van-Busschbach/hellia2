@@ -1,18 +1,12 @@
-using System;
-using System.Collections;
 using Runtime.Blocks.Attributes;
 using Runtime.Grid;
 using UnityEngine;
 using Utilities;
 
-namespace Runtime.Blocks
+namespace Runtime.Blocks.LightBlocks
 {
-    public class MoveableBlock : BaseBlock
+    public class PushableLightEmitter : LightEmitter
     {
-        [SerializeField] private float fallSpeedMultiplier = 5;
-        [SerializeField] private AnimationCurve fallAnimationCurve = default;
-
-
         [CanInteract]
         public bool CanBePushedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
         {
@@ -29,7 +23,6 @@ namespace Runtime.Blocks
         public void OnInteractedByPlayer(PlayerBlock playerBlock, Vector3Int direction)
         {
             GridManager.Instance.Move(this, transform.position.ToVector3Int() + direction);
-            if (CanFallAt(transform.position.ToVector3Int())) DoFall();
         }
 
 
@@ -50,17 +43,5 @@ namespace Runtime.Blocks
             var baseBlock = gridManager.GetFirstBlockInDirection(myPosition + Vector3Int.down,  Vector3Int.down, 10);
             return baseBlock != null;
         }
-
-        protected void DoFall()
-        {
-            GridManager gridManager = GridManager.Instance;
-            Vector3Int myPosition = transform.position.ToVector3Int();
-            
-            var baseBlock = gridManager.GetFirstBlockInDirection(myPosition + Vector3Int.down,  Vector3Int.down, 10);
-            if (baseBlock == null) return;
-
-            GridManager.Instance.Move(this, baseBlock.transform.position.ToVector3Int() + Vector3Int.up);
-        }
-        
     }
 }
