@@ -58,26 +58,26 @@ namespace Runtime.Blocks
                 direction = new Vector3Int(-direction.z, direction.y, direction.x);
             }
 
+            if (direction == Vector3Int.zero) return;
+            
+            LookAtDirection(direction);
             if (CanMove(direction))
             {
                 DoMove(direction);
             }
+            
         }
 
 
         [DidInteract]
         public bool DidInteractWithMoveAble(MoveableBlock block, Vector3Int direction)
         {
-            LookAtDirection(direction);
-
             return false;
         }
 
         [DidInteract]
         public bool DidInteractWithClimbable(ClimbableBlock climbableBlock, Vector3Int direction)
         {
-            LookAtDirection(direction);
-
             GridManager.Instance.Move(this, climbableBlock.transform.position.ToVector3Int() + Vector3Int.up);
             return false;
         }
@@ -85,8 +85,6 @@ namespace Runtime.Blocks
         [CanInteract]
         public bool CanInteractWithEmptySpace(Vector3Int direction)
         {
-            LookAtDirection(direction);
-
             Vector3Int newPosition = transform.position.ToVector3Int() + direction;
 
             // there is no block we can standing... but can we climb down the block we are standing on?
@@ -110,8 +108,6 @@ namespace Runtime.Blocks
         [DidInteract]
         public bool DidInteract(Vector3Int direction)
         {
-            LookAtDirection(direction);
-
             Vector3Int newPosition = transform.position.ToVector3Int() + direction;
 
             if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) != null)
