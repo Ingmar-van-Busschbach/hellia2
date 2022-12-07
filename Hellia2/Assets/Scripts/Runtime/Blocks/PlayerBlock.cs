@@ -72,15 +72,7 @@ namespace Runtime.Blocks
         [DidInteract]
         public bool DidInteractWithClimbable(ClimbableBlock climbableBlock, Vector3Int direction)
         {
-            if (climbableBlock.transform.position.ToVector3Int() == transform.position.ToVector3Int() + Vector3Int.down)
-            {
-                transform.position = climbableBlock.transform.position.ToVector3Int() + Vector3Int.up;
-            }
-            else
-            {
-                transform.position = climbableBlock.transform.position.ToVector3Int() + Vector3Int.up;
-            }
-
+            GridManager.Instance.Move(this, climbableBlock.transform.position.ToVector3Int() + Vector3Int.up);
             return false;
         }
 
@@ -127,7 +119,7 @@ namespace Runtime.Blocks
             // so we can probably climb down... are we standing on a climbable?
             ClimbableBlock climbableBlock = GetBlockBeneath() as ClimbableBlock;
             if (climbableBlock == null) return false;
-            transform.position = climbableBlock.transform.position.ToVector3Int() + direction;
+            GridManager.Instance.Move(this, climbableBlock.transform.position.ToVector3Int() + direction);
             return false;
         }
     }
