@@ -7,10 +7,12 @@ namespace Runtime.Blocks
 {
     public class PlayerBlock : BaseBlock
     {
+        private Quaternion defaultRotation;
         private UnityEngine.Camera _mainCamera;
 
         private void Awake()
         {
+            defaultRotation = transform.rotation;
             _mainCamera = UnityEngine.Camera.main;
         }
 
@@ -66,12 +68,16 @@ namespace Runtime.Blocks
         [DidInteract]
         public bool DidInteractWithMoveAble(MoveableBlock block, Vector3Int direction)
         {
+            LookAtDirection(direction);
+
             return false;
         }
 
         [DidInteract]
         public bool DidInteractWithClimbable(ClimbableBlock climbableBlock, Vector3Int direction)
         {
+            LookAtDirection(direction);
+
             GridManager.Instance.Move(this, climbableBlock.transform.position.ToVector3Int() + Vector3Int.up);
             return false;
         }
@@ -79,6 +85,8 @@ namespace Runtime.Blocks
         [CanInteract]
         public bool CanInteractWithEmptySpace(Vector3Int direction)
         {
+            LookAtDirection(direction);
+
             Vector3Int newPosition = transform.position.ToVector3Int() + direction;
 
             // there is no block we can standing... but can we climb down the block we are standing on?
@@ -102,6 +110,8 @@ namespace Runtime.Blocks
         [DidInteract]
         public bool DidInteract(Vector3Int direction)
         {
+            LookAtDirection(direction);
+
             Vector3Int newPosition = transform.position.ToVector3Int() + direction;
 
             if (GridManager.Instance.GetBlockAt(newPosition + Vector3Int.down) != null)
@@ -121,6 +131,12 @@ namespace Runtime.Blocks
             if (climbableBlock == null) return false;
             GridManager.Instance.Move(this, climbableBlock.transform.position.ToVector3Int() + direction);
             return false;
+        }
+
+        private void LookAtDirection(Vector3Int direction)
+        {
+            var targetRot = Quaternion.LookRotation(direction);
+            transform.rotation = targetRot;
         }
     }
 }
